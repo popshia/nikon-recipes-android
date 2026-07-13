@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -32,23 +33,27 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Casino
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.GridView
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SearchBar
+import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -81,6 +86,8 @@ fun LibraryScreen(store: RecipeStore, nav: NavController) {
     var asCards by remember { mutableStateOf(true) }
     var showFilters by remember { mutableStateOf(false) }
     var showRandom by remember { mutableStateOf(false) }
+    var searchExpanded by remember { mutableStateOf(false) }
+    var showMenu by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
     val hasFilter = category != null || tag != null || author != null || favoritesOnly
@@ -99,84 +106,120 @@ fun LibraryScreen(store: RecipeStore, nav: NavController) {
     }
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Column {
-                        Text("Nikon Recipes", fontWeight = FontWeight.Bold)
-                        Text(
-                            "${filtered.size} of ${store.recipes.size} recipes",
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    }
-                },
-                actions = {
-                    IconButton(onClick = { asCards = !asCards }) {
-                        Icon(
-                            if (asCards) Icons.AutoMirrored.Filled.List else Icons.Default.GridView,
-                            contentDescription = "Toggle view",
-                        )
-                    }
-                    IconButton(onClick = { showFilters = true }) {
-                        Icon(
-                            Icons.Default.FilterList,
-                            contentDescription = "Filter",
-                            tint = if (hasFilter) MaterialTheme.colorScheme.primary
-                            else MaterialTheme.colorScheme.onSurface,
-                        )
-                    }
-                    IconButton(onClick = { nav.navigate("create") }) {
-                        Icon(Icons.Default.Add, contentDescription = "Create recipe")
-                    }
-                    IconButton(onClick = { nav.navigate("settings") }) {
-                        Icon(Icons.Default.Settings, contentDescription = "Settings")
-                    }
-                },
-            )
-        },
         floatingActionButton = {
-            FloatingActionButton(onClick = {
-                if (showRandom) return@FloatingActionButton
-                val recipe = store.recipes.randomOrNull() ?: return@FloatingActionButton
-                showRandom = true
-                scope.launch {
-                    delay(1500)
-                    showRandom = false
-                    nav.navigate("detail/${recipe.id}")
+            if (!showRandom && !searchExpanded) {
+                FloatingActionButton(onClick = {
+                    val recipe = store.recipes.randomOrNull() ?: return@FloatingActionButton
+                    showRandom = true
+                    scope.launch {
+                        delay(1500)
+                        showRandom = false
+                        nav.navigate("detail/${recipe.id}")
+                    }
+                }) {
+                    Icon(Icons.Default.Casino, contentDescription = "Random recipe")
                 }
-            }) {
-                Icon(Icons.Default.Casino, contentDescription = "Random recipe")
             }
         },
     ) { pad ->
         Box(Modifier.padding(pad).fillMaxSize()) {
-        Column(Modifier.fillMaxSize()) {
-            OutlinedTextField(
-                value = search,
-                onValueChange = { search = it },
-                placeholder = { Text("Search ${filtered.size} recipes") },
-                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
-            )
-            if (filtered.isEmpty()) {
-                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("No recipes — try a different search or filter.",
-                        color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
-            } else {
-                LazyColumn(
-                    contentPadding = PaddingValues(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(if (asCards) 14.dp else 4.dp),
+            Column(Modifier.fillMaxSize()) {
+                SearchBar(
+                    modifier = Modifier.fillMaxWidth(),
+                    // Scaffold already insets past the status bar, so don't double-pad here.
+                    windowInsets = WindowInsets(0, 0, 0, 0),
+                    expanded = searchExpanded,
+                    onExpandedChange = { searchExpanded = it },
+                    inputField = {
+                        SearchBarDefaults.InputField(
+                            query = search,
+                            onQueryChange = { search = it },
+                            onSearch = { searchExpanded = false },
+                            expanded = searchExpanded,
+                            onExpandedChange = { searchExpanded = it },
+                            placeholder = { Text("Search ${store.recipes.size} recipes") },
+                            leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+                            trailingIcon = {
+                                if (searchExpanded) {
+                                    if (search.isNotEmpty()) {
+                                        IconButton(onClick = { search = "" }) {
+                                            Icon(Icons.Default.Close, contentDescription = "Clear")
+                                        }
+                                    }
+                                } else {
+                                    Row {
+                                        IconButton(onClick = { showFilters = true }) {
+                                            Icon(
+                                                Icons.Default.FilterList,
+                                                contentDescription = "Filter",
+                                                tint = if (hasFilter) MaterialTheme.colorScheme.primary
+                                                else MaterialTheme.colorScheme.onSurfaceVariant,
+                                            )
+                                        }
+                                        Box {
+                                            IconButton(onClick = { showMenu = true }) {
+                                                Icon(Icons.Default.MoreVert, contentDescription = "More options")
+                                            }
+                                            DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
+                                                DropdownMenuItem(
+                                                    text = { Text(if (asCards) "List view" else "Card view") },
+                                                    leadingIcon = {
+                                                        Icon(
+                                                            if (asCards) Icons.AutoMirrored.Filled.List else Icons.Default.GridView,
+                                                            contentDescription = null,
+                                                        )
+                                                    },
+                                                    onClick = { asCards = !asCards; showMenu = false },
+                                                )
+                                                DropdownMenuItem(
+                                                    text = { Text("Create recipe") },
+                                                    leadingIcon = { Icon(Icons.Default.Add, contentDescription = null) },
+                                                    onClick = { showMenu = false; nav.navigate("create") },
+                                                )
+                                                DropdownMenuItem(
+                                                    text = { Text("Settings") },
+                                                    leadingIcon = { Icon(Icons.Default.Settings, contentDescription = null) },
+                                                    onClick = { showMenu = false; nav.navigate("settings") },
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                        )
+                    },
                 ) {
-                    items(filtered, key = { it.id }) { recipe ->
-                        if (asCards) RecipeCard(recipe) { nav.navigate("detail/${recipe.id}") }
-                        else RecipeRow(recipe) { nav.navigate("detail/${recipe.id}") }
+                    // Expanded: live search results.
+                    LazyColumn(contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)) {
+                        items(filtered, key = { it.id }) { recipe ->
+                            RecipeRow(recipe) { searchExpanded = false; nav.navigate("detail/${recipe.id}") }
+                        }
+                    }
+                }
+
+                Text(
+                    "${filtered.size} of ${store.recipes.size} recipes",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(start = 20.dp, top = 8.dp, bottom = 2.dp),
+                )
+                if (filtered.isEmpty()) {
+                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text("No recipes — try a different search or filter.",
+                            color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                } else {
+                    LazyColumn(
+                        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 6.dp, bottom = 96.dp),
+                        verticalArrangement = Arrangement.spacedBy(if (asCards) 14.dp else 4.dp),
+                    ) {
+                        items(filtered, key = { it.id }) { recipe ->
+                            if (asCards) RecipeCard(recipe) { nav.navigate("detail/${recipe.id}") }
+                            else RecipeRow(recipe) { nav.navigate("detail/${recipe.id}") }
+                        }
                     }
                 }
             }
-        }
             AnimatedVisibility(
                 visible = showRandom,
                 enter = fadeIn() + scaleIn(initialScale = 0.87f),
