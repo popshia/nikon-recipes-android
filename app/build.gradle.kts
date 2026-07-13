@@ -7,14 +7,15 @@ plugins {
 
 android {
     namespace = "com.noahlin.nikonpicturecontrol"
-    compileSdk = 34
+    compileSdk = 36
+    buildToolsVersion = "36.0.0"
 
     defaultConfig {
         applicationId = "com.noahlin.nikonpicturecontrol"
         minSdk = 26
-        targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+        targetSdk = 36
+        versionCode = 2
+        versionName = "2.0"
     }
 
     buildTypes {
@@ -34,7 +35,8 @@ android {
 }
 
 dependencies {
-    val composeBom = platform("androidx.compose:compose-bom:2024.09.02")
+    // Alpha BOM: the only channel that ships Material 3 Expressive (material3 1.5.0-alpha).
+    val composeBom = platform("androidx.compose:compose-bom-alpha:2026.03.00")
     implementation(composeBom)
 
     implementation("androidx.core:core-ktx:1.13.1")
@@ -45,10 +47,8 @@ dependencies {
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.material3:material3")
-    implementation("androidx.compose.material:material-icons-extended")
+    implementation("androidx.compose.material:material-icons-extended:1.7.8")
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.1")
     implementation("io.coil-kt:coil-compose:2.7.0")
-
-    debugImplementation("androidx.compose.ui:ui-tooling")
 }
