@@ -1,0 +1,25 @@
+{
+  "id": "GRP268ZM3PDM3YSX4PVFR427V1",
+  "name": "Agfa Ultra 100",
+  "slug": "agfa-ultra-100-by-stephan-morais",
+  "category": "Third Party Creator",
+  "tags": [
+    "Colour",
+    "Agfa",
+    "Film Sim"
+  ],
+  "description": null,
+  "author": "Stephan Morais",
+  "authorLink": "https://stephanfoto.com/",
+  "whiteBalance": "5750K",
+  "whiteBalanceShift": null,
+  "activeDLighting": "Off",
+  "evComp": null,
+  "grain": "2M",
+  "note": null,
+  "np3": "Agfa Ultra 100.NP3",
+  "images": [
+    "Agfa Ultra 100.jpg"
+  ],
+  "recipeLink": null
+}

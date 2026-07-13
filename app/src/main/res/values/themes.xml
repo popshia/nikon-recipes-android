@@ -1,0 +1,4 @@
+<resources>
+    <!-- Base theme is a Material3 splash-free theme; Compose supplies the real colors. -->
+    <style name="Theme.NikonPictureControl" parent="android:Theme.Material.Light.NoActionBar" />
+</resources>

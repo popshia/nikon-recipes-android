@@ -1,0 +1,25 @@
+{
+  "id": "1B0XAAPWFT0RVTJ89VECR4KYA6",
+  "name": "Leica Vivid Look",
+  "slug": "leica-vivid-look-by-stephan-morais",
+  "category": "Third Party Creator",
+  "tags": [
+    "Colour",
+    "Leica",
+    "Emulation"
+  ],
+  "description": null,
+  "author": "Stephan Morais",
+  "authorLink": "https://stephanfoto.com/",
+  "whiteBalance": "Natural Light Auto",
+  "whiteBalanceShift": null,
+  "activeDLighting": "Off or Auto",
+  "evComp": null,
+  "grain": null,
+  "note": null,
+  "np3": "Leica Vivid Look.NP3",
+  "images": [
+    "Leica Vivid Look.jpg"
+  ],
+  "recipeLink": null
+}

@@ -1,0 +1,21 @@
+{
+  "id": "7XDQECDJN9DBFJ9J6FVF8J3SDK",
+  "name": "Negative Film Yellow 02b",
+  "slug": "negative-film-yellow-02b-by-nikon",
+  "category": "Nikon Color Grading",
+  "tags": null,
+  "description": null,
+  "author": "Nikon",
+  "authorLink": null,
+  "whiteBalance": null,
+  "whiteBalanceShift": null,
+  "activeDLighting": null,
+  "evComp": null,
+  "grain": null,
+  "note": null,
+  "np3": "Negative_Ye_02b.NP3",
+  "images": [
+    "Negative_Ye_02b.jpg"
+  ],
+  "recipeLink": "https://imagingcloud.nikon.com/recipe/detail/?recipeId=01HXE0FY2WT5T1ZZ4HQCX4VANJ"
+}

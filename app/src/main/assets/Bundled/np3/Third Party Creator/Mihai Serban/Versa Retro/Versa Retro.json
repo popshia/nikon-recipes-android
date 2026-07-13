@@ -1,0 +1,31 @@
+{
+  "id": "EEWD2R1MBW11GRT2XHE1VRHRV7",
+  "name": "Versa Retro",
+  "slug": "versa-retro-by-mihai-serban",
+  "category": "Third Party Creator",
+  "tags": [
+    "Colour",
+    "Original"
+  ],
+  "description": "An original recipe designed to complete the set, primarily by desaturating cold colors for a more vintage look and a bit more warmth.",
+  "author": "Mihai Serban",
+  "authorLink": "https://www.serbanjpg.com/",
+  "whiteBalance": "Any",
+  "whiteBalanceShift": "Any, Usually A1.5",
+  "activeDLighting": "Auto",
+  "evComp": "0",
+  "grain": null,
+  "note": null,
+  "np3": "Versa Retro.NP3",
+  "images": [
+    "Versa Retro-1.jpg",
+    "Versa Retro-2.jpg",
+    "Versa Retro-3.jpg",
+    "Versa Retro-4.jpg",
+    "Versa Retro-5.jpg",
+    "Versa Retro-6.jpg",
+    "Versa Retro-7.jpg",
+    "Versa Retro.jpg"
+  ],
+  "recipeLink": "https://www.serbanjpg.com/versa-400-nikon-recipe-set/"
+}

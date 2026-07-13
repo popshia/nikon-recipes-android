@@ -1,0 +1,27 @@
+{
+  "id": "KKKXM7SPA43Q492TVT7ZD0NQ5Z",
+  "name": "Slide",
+  "slug": "slide-by-mark-g-adams",
+  "category": "Third Party Creator",
+  "tags": [
+    "Colour",
+    "Original"
+  ],
+  "description": "Type: General use 35mm film based.Great For: Everyday sunny weather!Description: A recipe inspired by nostalgia, of looking back at old summertime photographs.",
+  "author": "Mark G Adams",
+  "authorLink": "https://onecameraonelens.com/",
+  "whiteBalance": "Auto",
+  "whiteBalanceShift": null,
+  "activeDLighting": "Normal",
+  "evComp": null,
+  "grain": null,
+  "note": null,
+  "np3": "Slide.NP3",
+  "images": [
+    "Slide-1.webp",
+    "Slide-2.webp",
+    "Slide-3.webp",
+    "Slide-4.webp"
+  ],
+  "recipeLink": "https://onecameraonelens.com/nikon-imaging-recipes-colour/"
+}

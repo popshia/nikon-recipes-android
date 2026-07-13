@@ -1,0 +1,21 @@
+{
+  "id": "JW39AVDBKXE021DKCS0YW84TSD",
+  "name": "Vintage Portrait",
+  "slug": "vintage-portrait-by-kazu-fujisawa",
+  "category": "Nikon Creators",
+  "tags": null,
+  "description": null,
+  "author": "Kazu Fujisawa",
+  "authorLink": null,
+  "whiteBalance": null,
+  "whiteBalanceShift": null,
+  "activeDLighting": null,
+  "evComp": null,
+  "grain": null,
+  "note": null,
+  "np3": "VINTAGEPort_Fuji.NP3",
+  "images": [
+    "VINTAGEPort_Fuji.jpg"
+  ],
+  "recipeLink": "https://imagingcloud.nikon.com/recipe/detail/?recipeId=01K5QFQY4DGAW1E0TSG1Z5KQG7"
+}

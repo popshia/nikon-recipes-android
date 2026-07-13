@@ -1,0 +1,25 @@
+{
+  "id": "32V15QA97F46VFYN754EMJN9PQ",
+  "name": "OptiColour 200",
+  "slug": "opticolour-200-by-stephan-morais",
+  "category": "Third Party Creator",
+  "tags": [
+    "Colour",
+    "Optik",
+    "Film Sim"
+  ],
+  "description": null,
+  "author": "Stephan Morais",
+  "authorLink": "https://stephanfoto.com/",
+  "whiteBalance": "5750K or Natural Light Auto",
+  "whiteBalanceShift": null,
+  "activeDLighting": "Off",
+  "evComp": null,
+  "grain": "2M",
+  "note": null,
+  "np3": "OptiColour 200.NP3",
+  "images": [
+    "OptiColour 200.jpg"
+  ],
+  "recipeLink": null
+}

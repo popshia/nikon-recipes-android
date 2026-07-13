@@ -1,0 +1,21 @@
+{
+  "id": "TSX9DBZ7FFE64SH2VSY7H0XE0S",
+  "name": "24Look",
+  "slug": "24look-by-24frames",
+  "category": "Nikon Creators",
+  "tags": null,
+  "description": null,
+  "author": "24Frames",
+  "authorLink": null,
+  "whiteBalance": null,
+  "whiteBalanceShift": null,
+  "activeDLighting": null,
+  "evComp": null,
+  "grain": null,
+  "note": null,
+  "np3": "24Look.NP3",
+  "images": [
+    "24Look_24Frames.jpg"
+  ],
+  "recipeLink": "https://imagingcloud.nikon.com/recipe/detail/?recipeId=01K7JPWX7D8TJ9PTXKH8YN9GAW"
+}

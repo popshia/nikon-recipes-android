@@ -1,0 +1,21 @@
+{
+  "id": "V3Z6B1GJT8VJX00ZWG8S02VQDZ",
+  "name": "Negative Film Yellow&Green 01a",
+  "slug": "negative-film-yellow-green-01a-by-nikon",
+  "category": "Nikon Color Grading",
+  "tags": null,
+  "description": null,
+  "author": "Nikon",
+  "authorLink": null,
+  "whiteBalance": null,
+  "whiteBalanceShift": null,
+  "activeDLighting": null,
+  "evComp": null,
+  "grain": null,
+  "note": null,
+  "np3": "Negative_YeGn_01a.NP3",
+  "images": [
+    "Negative_YeGn_01a.jpg"
+  ],
+  "recipeLink": "https://imagingcloud.nikon.com/recipe/detail/?recipeId=01HXE0FXGEXJSZSYJJE8M3TZVC"
+}

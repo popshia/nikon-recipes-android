@@ -1,0 +1,25 @@
+{
+  "id": "TW1MP0KAJ347JKNSP3WRK53SS7",
+  "name": "Kodak Gold 200",
+  "slug": "kodak-gold-200-by-stephan-morais",
+  "category": "Third Party Creator",
+  "tags": [
+    "Colour",
+    "Kodak",
+    "Film Sim"
+  ],
+  "description": null,
+  "author": "Stephan Morais",
+  "authorLink": "https://stephanfoto.com/",
+  "whiteBalance": "5750K",
+  "whiteBalanceShift": null,
+  "activeDLighting": "Off",
+  "evComp": null,
+  "grain": "2M",
+  "note": null,
+  "np3": "Kodak Gold 200.NP3",
+  "images": [
+    "Kodak Gold 200.jpg"
+  ],
+  "recipeLink": null
+}

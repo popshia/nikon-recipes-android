@@ -1,0 +1,31 @@
+{
+  "id": "FFMJ3NR0NTZCDDX0NAHSPD9GY1",
+  "name": "MonoFilmic",
+  "slug": "monofilmic-by-mark-g-adams",
+  "category": "Third Party Creator",
+  "tags": [
+    "B&W",
+    "Original"
+  ],
+  "description": "Type: Retro Monochrome.Great for: Landscapes, architecture, portraits, people and general use.Description: A recipe based on the look of old movies, with raised shadows and the general look of a very old filmstock",
+  "author": "Mark G Adams",
+  "authorLink": "https://onecameraonelens.com/",
+  "whiteBalance": "Auto",
+  "whiteBalanceShift": null,
+  "activeDLighting": "Normal",
+  "evComp": null,
+  "grain": null,
+  "note": null,
+  "np3": "MonoFilmic.NP3",
+  "images": [
+    "MonoFilmic-1.webp",
+    "MonoFilmic-2.webp",
+    "MonoFilmic-3.webp",
+    "MonoFilmic-4.webp",
+    "MonoFilmic-5.webp",
+    "MonoFilmic-6.webp",
+    "MonoFilmic-7.webp",
+    "MonoFilmic-8.webp"
+  ],
+  "recipeLink": "https://onecameraonelens.com/nikon-imaging-recipes-monochrome/"
+}

@@ -1,0 +1,21 @@
+{
+  "id": "DGMECMM4BSRPFDFV35QGD2VVRH",
+  "name": "CineBias WC - Grit & Glow",
+  "slug": "cinebias-wc-grit-glow-by-red",
+  "category": "Nikon Creators",
+  "tags": null,
+  "description": null,
+  "author": "RED",
+  "authorLink": null,
+  "whiteBalance": null,
+  "whiteBalanceShift": null,
+  "activeDLighting": null,
+  "evComp": null,
+  "grain": null,
+  "note": null,
+  "np3": "CineBias-WC.NP3",
+  "images": [
+    "CineBias-WC.jpg"
+  ],
+  "recipeLink": "https://imagingcloud.nikon.com/recipe/detail/?recipeId=01KBXWVJEEE90BPXFKS1GAA3KB"
+}

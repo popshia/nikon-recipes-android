@@ -1,0 +1,21 @@
+{
+  "id": "D5ZJ1887VNCBPVB0V231ZPM2P8",
+  "name": "Nature",
+  "slug": "nature-by-links",
+  "category": "Nikon Creators",
+  "tags": null,
+  "description": null,
+  "author": "Links",
+  "authorLink": null,
+  "whiteBalance": null,
+  "whiteBalanceShift": null,
+  "activeDLighting": null,
+  "evComp": null,
+  "grain": null,
+  "note": null,
+  "np3": "Nature_Links.NP3",
+  "images": [
+    "Nature_Links.jpg"
+  ],
+  "recipeLink": "https://imagingcloud.nikon.com/recipe/detail/?recipeId=01JAW72MB3K50GPYD0MPXSKM6D"
+}

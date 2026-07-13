@@ -1,0 +1,21 @@
+{
+  "id": "WQJ9XJTR5MARWYEMZ2ZM8GM9E7",
+  "name": "Primary Pop",
+  "slug": "primary-pop-by-gilmar-smith",
+  "category": "Nikon Creators",
+  "tags": null,
+  "description": null,
+  "author": "Gilmar Smith",
+  "authorLink": null,
+  "whiteBalance": null,
+  "whiteBalanceShift": null,
+  "activeDLighting": null,
+  "evComp": null,
+  "grain": null,
+  "note": null,
+  "np3": "PrimaryPop_Gilmar.NP3",
+  "images": [
+    "PrimaryPop_Gilmar.jpg"
+  ],
+  "recipeLink": "https://imagingcloud.nikon.com/recipe/detail/?recipeId=01JD1NQB4GSGSD81KE1X2D7QGA"
+}

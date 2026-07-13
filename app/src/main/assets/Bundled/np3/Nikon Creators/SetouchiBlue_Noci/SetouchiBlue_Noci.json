@@ -1,0 +1,21 @@
+{
+  "id": "CP2BX9YXWMXD7ENSPEN72P9AT6",
+  "name": "Setouchi Blue",
+  "slug": "setouchi-blue-by-noci-kosho",
+  "category": "Nikon Creators",
+  "tags": null,
+  "description": null,
+  "author": "Noci Kosho",
+  "authorLink": null,
+  "whiteBalance": null,
+  "whiteBalanceShift": null,
+  "activeDLighting": null,
+  "evComp": null,
+  "grain": null,
+  "note": null,
+  "np3": "SetouchiBlue_Noci.NP3",
+  "images": [
+    "SetouchiBlue_Noci.jpg"
+  ],
+  "recipeLink": "https://imagingcloud.nikon.com/recipe/detail/?recipeId=01J6VE2V8RYST2J73H9P8402DZ"
+}

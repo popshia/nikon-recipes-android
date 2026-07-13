@@ -1,0 +1,21 @@
+{
+  "id": "C1YEDTJGER3CZY1TDFJ1QCPHFH",
+  "name": "Warm Portrait",
+  "slug": "warm-portrait-by-y2",
+  "category": "Nikon Creators",
+  "tags": null,
+  "description": null,
+  "author": "Y2",
+  "authorLink": null,
+  "whiteBalance": null,
+  "whiteBalanceShift": null,
+  "activeDLighting": null,
+  "evComp": null,
+  "grain": null,
+  "note": null,
+  "np3": "WarmPortrait_Y2.NP3",
+  "images": [
+    "WarmPortrait_Y2.jpg"
+  ],
+  "recipeLink": "https://imagingcloud.nikon.com/recipe/detail/?recipeId=01J6VE2VWEE7YV7WH40ECVR57W"
+}

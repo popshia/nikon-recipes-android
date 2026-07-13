@@ -1,0 +1,21 @@
+{
+  "id": "0GCTPCGD5BER5SKRZJ3MB2P1FW",
+  "name": "Negative Film Blue 01b",
+  "slug": "negative-film-blue-01b-by-nikon",
+  "category": "Nikon Color Grading",
+  "tags": null,
+  "description": null,
+  "author": "Nikon",
+  "authorLink": null,
+  "whiteBalance": null,
+  "whiteBalanceShift": null,
+  "activeDLighting": null,
+  "evComp": null,
+  "grain": null,
+  "note": null,
+  "np3": "Negative_Bu_01b.NP3",
+  "images": [
+    "Negative_Bu_01b.jpg"
+  ],
+  "recipeLink": "https://imagingcloud.nikon.com/recipe/detail/?recipeId=01HXE0FZCNEAJ8E9VAYG603182"
+}

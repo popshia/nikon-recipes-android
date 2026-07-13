@@ -1,0 +1,32 @@
+{
+  "id": "H0NV951SFC5DBZ0QKCFFBD9ZXW",
+  "name": "AcrosLike",
+  "slug": "acroslike-by-mark-g-adams",
+  "category": "Third Party Creator",
+  "tags": [
+    "B&W",
+    "Fuji",
+    "Film Sim"
+  ],
+  "description": "Type: Retro Monochrome.Great for: Landscapes, people, portraits, architecture and general use.Description: Fuji Acros, for the Nikon!",
+  "author": "Mark G Adams",
+  "authorLink": "https://onecameraonelens.com/",
+  "whiteBalance": "Auto",
+  "whiteBalanceShift": null,
+  "activeDLighting": "Normal",
+  "evComp": null,
+  "grain": null,
+  "note": null,
+  "np3": "AcrosLike.NP3",
+  "images": [
+    "AcrosLike-1.webp",
+    "AcrosLike-2.webp",
+    "AcrosLike-3.webp",
+    "AcrosLike-4.webp",
+    "AcrosLike-5.webp",
+    "AcrosLike-6.webp",
+    "AcrosLike-7.webp",
+    "AcrosLike-8.webp"
+  ],
+  "recipeLink": "https://onecameraonelens.com/nikon-imaging-recipes-monochrome/"
+}

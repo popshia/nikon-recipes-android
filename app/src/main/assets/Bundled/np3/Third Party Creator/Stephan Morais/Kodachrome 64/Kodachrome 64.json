@@ -1,0 +1,25 @@
+{
+  "id": "WV4W8QSEW6WQHV1478Y5WGFYW1",
+  "name": "Kodachrome 64",
+  "slug": "kodachrome-64-by-stephan-morais",
+  "category": "Third Party Creator",
+  "tags": [
+    "Colour",
+    "Kodak",
+    "Film Sim"
+  ],
+  "description": null,
+  "author": "Stephan Morais",
+  "authorLink": "https://stephanfoto.com/",
+  "whiteBalance": "5750K",
+  "whiteBalanceShift": null,
+  "activeDLighting": "Off",
+  "evComp": null,
+  "grain": "2M",
+  "note": null,
+  "np3": "Kodachrome 64.NP3",
+  "images": [
+    "Kodachrome 64.jpg"
+  ],
+  "recipeLink": null
+}

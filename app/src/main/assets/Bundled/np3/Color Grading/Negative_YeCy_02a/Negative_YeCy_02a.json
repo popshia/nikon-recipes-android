@@ -1,0 +1,21 @@
+{
+  "id": "D4EM8CJHG0VAYA1WPRKW6A2P1E",
+  "name": "Negative Film Yellow&Cyan 02a",
+  "slug": "negative-film-yellow-cyan-02a-by-nikon",
+  "category": "Nikon Color Grading",
+  "tags": null,
+  "description": null,
+  "author": "Nikon",
+  "authorLink": null,
+  "whiteBalance": null,
+  "whiteBalanceShift": null,
+  "activeDLighting": null,
+  "evComp": null,
+  "grain": null,
+  "note": null,
+  "np3": "Negative_YeCy_02a.NP3",
+  "images": [
+    "Negative_YeCy_02a.jpg"
+  ],
+  "recipeLink": "https://imagingcloud.nikon.com/recipe/detail/?recipeId=01HXE0FTZJPCMRZ83MWWJ13KGD"
+}

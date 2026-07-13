@@ -1,0 +1,25 @@
+{
+  "id": "66ZHQWZBQKE11X1EGCKE7YRG5V",
+  "name": "Leica Standard Look",
+  "slug": "leica-standard-look-by-stephan-morais",
+  "category": "Third Party Creator",
+  "tags": [
+    "Colour",
+    "Leica",
+    "Emulation"
+  ],
+  "description": null,
+  "author": "Stephan Morais",
+  "authorLink": "https://stephanfoto.com/",
+  "whiteBalance": "Natural Light Auto",
+  "whiteBalanceShift": null,
+  "activeDLighting": "Off or Auto",
+  "evComp": null,
+  "grain": null,
+  "note": null,
+  "np3": "Leica Standard Look.NP3",
+  "images": [
+    "Leica Standard Look.jpg"
+  ],
+  "recipeLink": null
+}

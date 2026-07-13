@@ -1,0 +1,21 @@
+{
+  "id": "A2V45D3C2AMNR7AZYCMDJTDRV3",
+  "name": "Sunset Reset",
+  "slug": "sunset-reset-by-baek-jaekwang",
+  "category": "Nikon Creators",
+  "tags": null,
+  "description": null,
+  "author": "Baek Jaekwang",
+  "authorLink": null,
+  "whiteBalance": null,
+  "whiteBalanceShift": null,
+  "activeDLighting": null,
+  "evComp": null,
+  "grain": null,
+  "note": null,
+  "np3": "SunsetReset_Baek.NP3",
+  "images": [
+    "SunsetReset_Baek.jpg"
+  ],
+  "recipeLink": "https://imagingcloud.nikon.com/recipe/detail/?recipeId=01JD1NQA7B9TWE10JBSVQ6WSH4"
+}

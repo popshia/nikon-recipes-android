@@ -1,0 +1,32 @@
+{
+  "id": "VAAED3QV7B2ZR7RXJRM5HZFFBD",
+  "name": "Portra-Fade",
+  "slug": "portra-fade-by-mark-g-adams",
+  "category": "Third Party Creator",
+  "tags": [
+    "Colour",
+    "Kodak",
+    "Film Sim"
+  ],
+  "description": "Type: Retro Film.Great for: Landscapes, people, portraits, architecture and general use.Description: This is really just an old film look, that works well on many images. Often, it can be used alongside the MGA Portra-Ish recipe depending on the lighting etc, and it will not look out of place with the rest of the images.",
+  "author": "Mark G Adams",
+  "authorLink": "https://onecameraonelens.com/",
+  "whiteBalance": "Auto",
+  "whiteBalanceShift": null,
+  "activeDLighting": "Normal",
+  "evComp": null,
+  "grain": null,
+  "note": null,
+  "np3": "Portra-Fade.NP3",
+  "images": [
+    "Portra-Fade-1.webp",
+    "Portra-Fade-2.webp",
+    "Portra-Fade-3.webp",
+    "Portra-Fade-4.webp",
+    "Portra-Fade-5.webp",
+    "Portra-Fade-6.webp",
+    "Portra-Fade-7.webp",
+    "Portra-Fade-8.webp"
+  ],
+  "recipeLink": "https://onecameraonelens.com/nikon-imaging-recipes-colour/"
+}

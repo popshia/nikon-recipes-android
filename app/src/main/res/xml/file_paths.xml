@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <!-- Where we stage .NP3 files before sharing them via the system share sheet. -->
+    <cache-path name="shared" path="shared/" />
+    <files-path name="assets" path="RecipeLibrary/" />
+</paths>

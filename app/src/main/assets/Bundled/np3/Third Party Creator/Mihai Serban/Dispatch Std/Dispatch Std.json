@@ -1,0 +1,24 @@
+{
+  "id": "J4FEPK1ETBV202PVJ1WGS74NZG",
+  "name": "Dispatch Std",
+  "slug": "dispatch-std-by-mihai-serban",
+  "category": "Third Party Creator",
+  "tags": [
+    "Colour",
+    "Original"
+  ],
+  "description": "Based on the Fuji Recipe - The original recipe was inspired by modern photojournalism and built on ProNeg Std. The Nikon variant is matching it closely (with some minor differences in greens and blues).",
+  "author": "Mihai Serban",
+  "authorLink": "https://www.serbanjpg.com/",
+  "whiteBalance": "5600K",
+  "whiteBalanceShift": "B0.5 M0.5",
+  "activeDLighting": "High",
+  "evComp": "+1/3 and up",
+  "grain": null,
+  "note": null,
+  "np3": "Dispatch Std.NP3",
+  "images": [
+    "Dispatch Std.jpg"
+  ],
+  "recipeLink": null
+}

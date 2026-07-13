@@ -1,0 +1,21 @@
+{
+  "id": "HPXD4QWD65AX6NHQ6YK787DZ52",
+  "name": "Clear Portrait",
+  "slug": "clear-portrait-by-takahiro-sakai",
+  "category": "Nikon Creators",
+  "tags": null,
+  "description": null,
+  "author": "Takahiro Sakai",
+  "authorLink": null,
+  "whiteBalance": null,
+  "whiteBalanceShift": null,
+  "activeDLighting": null,
+  "evComp": null,
+  "grain": null,
+  "note": null,
+  "np3": "ClrPortrait_TSakai.NP3",
+  "images": [
+    "ClrPortrait_TSakai.jpg"
+  ],
+  "recipeLink": "https://imagingcloud.nikon.com/recipe/detail/?recipeId=01J6VE2VM244K3HXNXD9K27FCE"
+}

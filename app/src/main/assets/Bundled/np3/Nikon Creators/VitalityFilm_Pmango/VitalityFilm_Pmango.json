@@ -1,0 +1,21 @@
+{
+  "id": "2GEV2BTMVRG8YA6CHAKPFSEE19",
+  "name": "Vitality Film",
+  "slug": "vitality-film-by-peng-mango",
+  "category": "Nikon Creators",
+  "tags": null,
+  "description": null,
+  "author": "Peng Mango",
+  "authorLink": null,
+  "whiteBalance": null,
+  "whiteBalanceShift": null,
+  "activeDLighting": null,
+  "evComp": null,
+  "grain": null,
+  "note": null,
+  "np3": "VitalityFilm_Pmango.NP3",
+  "images": [
+    "VitalityFilm_Pmango.jpg"
+  ],
+  "recipeLink": "https://imagingcloud.nikon.com/recipe/detail/?recipeId=01JSBJ2V0WP3BKCQ3BEM5RE9MF"
+}

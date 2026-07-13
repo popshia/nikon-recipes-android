@@ -1,0 +1,21 @@
+{
+  "id": "Y52Z407SCT55SDNP0SPM0S7Q12",
+  "name": "Bluegrain",
+  "slug": "bluegrain-by-jyota-tomonori",
+  "category": "Nikon Creators",
+  "tags": null,
+  "description": null,
+  "author": "jyota tomonori",
+  "authorLink": null,
+  "whiteBalance": null,
+  "whiteBalanceShift": null,
+  "activeDLighting": null,
+  "evComp": null,
+  "grain": null,
+  "note": null,
+  "np3": "Bluegrain_jyota.NP3",
+  "images": [
+    "Bluegrain_jyota.jpg"
+  ],
+  "recipeLink": "https://imagingcloud.nikon.com/recipe/detail/?recipeId=01KHT1SW5NY63WR4ZGVBWEC2ER"
+}

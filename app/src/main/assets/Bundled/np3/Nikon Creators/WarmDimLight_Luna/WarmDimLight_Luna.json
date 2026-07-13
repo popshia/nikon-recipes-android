@@ -1,0 +1,21 @@
+{
+  "id": "GM4BA23EF27Z0T3TWQMVGNA00G",
+  "name": "Warm-toned dim lighting",
+  "slug": "warm-toned-dim-lighting-by-luna",
+  "category": "Nikon Creators",
+  "tags": null,
+  "description": null,
+  "author": "Luna",
+  "authorLink": null,
+  "whiteBalance": null,
+  "whiteBalanceShift": null,
+  "activeDLighting": null,
+  "evComp": null,
+  "grain": null,
+  "note": null,
+  "np3": "WarmDimLight_Luna.NP3",
+  "images": [
+    "WarmDimLight_Luna.jpg"
+  ],
+  "recipeLink": "https://imagingcloud.nikon.com/recipe/detail/?recipeId=01JAW72MS6W8FR5WX1ZJFNQ1B8"
+}

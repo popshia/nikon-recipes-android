@@ -1,0 +1,34 @@
+{
+  "id": "31GT2MDQAWZVT6QVVWQGZTMNWD",
+  "name": "Agfa Ultra",
+  "slug": "agfa-ultra-by-mihai-serban",
+  "category": "Third Party Creator",
+  "tags": [
+    "Agfa",
+    "Colour",
+    "Film Sim"
+  ],
+  "description": "Inspired by one of Agfa’s most vivid color films, this recipe was designed to push saturation as far as possible (without any clipping). As you might expect, this picture profile isn’t ideal for skin tones, which seems to be a trait it shares with the original film stock.",
+  "author": "Mihai Serban",
+  "authorLink": "https://www.serbanjpg.com/",
+  "whiteBalance": null,
+  "whiteBalanceShift": null,
+  "activeDLighting": null,
+  "evComp": null,
+  "grain": null,
+  "note": null,
+  "np3": "Agfa Ultra.NP3",
+  "images": [
+    "Agfa Ultra-1.jpeg",
+    "Agfa Ultra-2.jpeg",
+    "Agfa Ultra-3.jpeg",
+    "Agfa Ultra-4.jpeg",
+    "Agfa Ultra-5.jpg",
+    "Agfa Ultra-6.jpeg",
+    "Agfa Ultra-7.jpeg",
+    "Agfa Ultra-8.jpeg",
+    "Agfa Ultra-9.jpeg",
+    "Agfa Ultra-10.jpeg"
+  ],
+  "recipeLink": "https://www.serbanjpg.com/agfa-legacy-nikon-recipe-set/"
+}

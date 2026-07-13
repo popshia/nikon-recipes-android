@@ -1,0 +1,38 @@
+{
+  "id": "PMY6JNBMRY1Q9KMWM57F2DFKFY",
+  "name": "Kodak Portra 800",
+  "slug": "kodak-portra-800-by-alex-armitage",
+  "category": "Third Party Creator",
+  "tags": [
+    "Colour",
+    "Kodak",
+    "Film Sim"
+  ],
+  "description": null,
+  "author": "Alex Armitage",
+  "authorLink": "https://www.alexarmitage.com/",
+  "whiteBalance": null,
+  "whiteBalanceShift": null,
+  "activeDLighting": null,
+  "evComp": null,
+  "grain": null,
+  "note": null,
+  "np3": "Kodak Portra 800.NP3",
+  "images": [
+    "Kodak Portra 800-1.jpg",
+    "Kodak Portra 800-2.jpg",
+    "Kodak Portra 800-3.jpg",
+    "Kodak Portra 800-4.jpg",
+    "Kodak Portra 800-5.jpg",
+    "Kodak Portra 800-6.jpg",
+    "Kodak Portra 800-7.jpg",
+    "Kodak Portra 800-8.jpg",
+    "Kodak Portra 800-9.jpg",
+    "Kodak Portra 800-10.jpg",
+    "Kodak Portra 800-11.jpg",
+    "Kodak Portra 800-12.jpg",
+    "Kodak Portra 800-13.jpg",
+    "Kodak Portra 800-14.jpg"
+  ],
+  "recipeLink": "https://www.alexarmitage.com/nikon-zf-recipes"
+}

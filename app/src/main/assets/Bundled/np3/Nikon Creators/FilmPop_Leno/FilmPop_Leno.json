@@ -1,0 +1,21 @@
+{
+  "id": "T9D8FP1E2X2M69RK58Z084S8MH",
+  "name": "Film Pop",
+  "slug": "film-pop-by-leno-cainelli",
+  "category": "Nikon Creators",
+  "tags": null,
+  "description": null,
+  "author": "Leno Cainelli",
+  "authorLink": null,
+  "whiteBalance": null,
+  "whiteBalanceShift": null,
+  "activeDLighting": null,
+  "evComp": null,
+  "grain": null,
+  "note": null,
+  "np3": "FilmPop_Leno.NP3",
+  "images": [
+    "FilmPop_Leno.jpg"
+  ],
+  "recipeLink": "https://imagingcloud.nikon.com/recipe/detail/?recipeId=01JD1NQ9QQXZQ4K61FYGAMWACV"
+}

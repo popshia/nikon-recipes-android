@@ -1,0 +1,25 @@
+{
+  "id": "3H425E5KWJBCCZ68D6ZZCH09XQ",
+  "name": "Fuji Provia 100F",
+  "slug": "fuji-provia-100f-by-stephan-morais",
+  "category": "Third Party Creator",
+  "tags": [
+    "Colour",
+    "Fuji",
+    "Film Sim"
+  ],
+  "description": null,
+  "author": "Stephan Morais",
+  "authorLink": "https://stephanfoto.com/",
+  "whiteBalance": "5750K",
+  "whiteBalanceShift": null,
+  "activeDLighting": "Off",
+  "evComp": null,
+  "grain": "2M",
+  "note": null,
+  "np3": "Fuji Provia 100F.NP3",
+  "images": [
+    "Fuji Provia 100F.jpg"
+  ],
+  "recipeLink": null
+}

@@ -1,0 +1,43 @@
+{
+  "id": "5XAN8VM56TEC3E2QYME9T2FC0W",
+  "name": "Filmic",
+  "slug": "filmic-by-denis-zeqiri-filmstill",
+  "category": "Third Party Creator",
+  "tags": [
+    "Colour",
+    "Film Sim"
+  ],
+  "description": null,
+  "author": "Denis Zeqiri (filmstill__)",
+  "authorLink": "https://www.instagram.com/filmstill__/?hl=en",
+  "whiteBalance": "Auto A1, 2500K to 3500K for artificial light",
+  "whiteBalanceShift": null,
+  "activeDLighting": "Low",
+  "evComp": null,
+  "grain": "As you like",
+  "note": null,
+  "np3": "Filmic.NP3",
+  "images": [
+    "Filmic-1.jpg",
+    "Filmic-2.jpg",
+    "Filmic-3.jpg",
+    "Filmic-4.jpg",
+    "Filmic-5.jpg",
+    "Filmic-6.jpg",
+    "Filmic-7.jpg",
+    "Filmic-8.jpg",
+    "Filmic-9.jpg",
+    "Filmic-10.jpg",
+    "Filmic-11.jpg",
+    "Filmic-12.jpg",
+    "Filmic-13.jpg",
+    "Filmic-14.jpg",
+    "Filmic-15.jpg",
+    "Filmic-16.jpg",
+    "Filmic-17.jpg",
+    "Filmic-18.jpg",
+    "Filmic-19.jpg",
+    "Filmic-20.jpg"
+  ],
+  "recipeLink": null
+}

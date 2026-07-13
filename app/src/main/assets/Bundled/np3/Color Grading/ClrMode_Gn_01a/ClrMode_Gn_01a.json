@@ -1,0 +1,21 @@
+{
+  "id": "TD1WAZXFDDY2QX2B5NN818FF7S",
+  "name": "Color Mode Green 01a",
+  "slug": "color-mode-green-01a-by-nikon",
+  "category": "Nikon Color Grading",
+  "tags": null,
+  "description": null,
+  "author": "Nikon",
+  "authorLink": null,
+  "whiteBalance": null,
+  "whiteBalanceShift": null,
+  "activeDLighting": null,
+  "evComp": null,
+  "grain": null,
+  "note": null,
+  "np3": "ClrMode_Gn_01a.NP3",
+  "images": [
+    "ClrMode_Gn_01a.jpg"
+  ],
+  "recipeLink": "https://imagingcloud.nikon.com/recipe/detail/?recipeId=01HXE0FW0VA73XMSXTPTSQQCAT"
+}

@@ -1,0 +1,33 @@
+{
+  "id": "364WAW3PWQNPBE9B94BNRM6J83",
+  "name": "LUX B&W HC",
+  "slug": "lux-b-w-hc-by-mihai-serban",
+  "category": "Third Party Creator",
+  "tags": [
+    "B&W",
+    "Leica",
+    "Emulation"
+  ],
+  "description": "The high-contrast monochrome look needs little introduction. This is a no-nonsense recipe built on Nikon’s Deep Tone Monochrome profile, refined with a custom tone curve that amplifies the contrast. One key advantage is that it works seamlessly in the Zf’s native B&W switch/mode, something I consider a big advantage, even if I don’t shoot black and white all that often. I usually turn off Active D-Lighting when using this recipe. Disabling it helps preserve deep shadows and maximizes the high-contrast look.",
+  "author": "Mihai Serban",
+  "authorLink": "https://www.serbanjpg.com/",
+  "whiteBalance": null,
+  "whiteBalanceShift": null,
+  "activeDLighting": null,
+  "evComp": null,
+  "grain": null,
+  "note": null,
+  "np3": "LUX B&W HC.NP3",
+  "images": [
+    "LUX B&W HC-1.JPG",
+    "LUX B&W HC-2.JPG",
+    "LUX B&W HC-3.JPG",
+    "LUX B&W HC-4.JPG",
+    "LUX B&W HC-5.JPG",
+    "LUX B&W HC-6.JPG",
+    "LUX B&W HC-7.JPG",
+    "LUX B&W HC-8.JPG",
+    "LUX B&W HC-9.JPG"
+  ],
+  "recipeLink": "https://www.serbanjpg.com/lux-nikon-recipe-set/"
+}

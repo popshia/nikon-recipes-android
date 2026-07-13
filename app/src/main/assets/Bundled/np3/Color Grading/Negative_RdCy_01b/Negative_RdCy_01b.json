@@ -1,0 +1,21 @@
+{
+  "id": "YQ4R66FFBDCNW2G34ZK5WDXJDV",
+  "name": "NegativeFilm Red&Cyan 01b",
+  "slug": "negativefilm-red-cyan-01b-by-nikon",
+  "category": "Nikon Color Grading",
+  "tags": null,
+  "description": null,
+  "author": "Nikon",
+  "authorLink": null,
+  "whiteBalance": null,
+  "whiteBalanceShift": null,
+  "activeDLighting": null,
+  "evComp": null,
+  "grain": null,
+  "note": null,
+  "np3": "Negative_RdCy_01b.NP3",
+  "images": [
+    "Negative_RdCy_01b.jpg"
+  ],
+  "recipeLink": "https://imagingcloud.nikon.com/recipe/detail/?recipeId=01HXE0FYDYJN5B51FNDEFQEZMF"
+}

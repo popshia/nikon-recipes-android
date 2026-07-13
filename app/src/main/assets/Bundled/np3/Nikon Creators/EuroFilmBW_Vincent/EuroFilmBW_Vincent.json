@@ -1,0 +1,21 @@
+{
+  "id": "G3VHRJG80C86DYVBHM4BFA68WS",
+  "name": "Euro Film Black and White",
+  "slug": "euro-film-black-and-white-by-vincent-versace",
+  "category": "Nikon Creators",
+  "tags": null,
+  "description": null,
+  "author": "Vincent Versace",
+  "authorLink": null,
+  "whiteBalance": null,
+  "whiteBalanceShift": null,
+  "activeDLighting": null,
+  "evComp": null,
+  "grain": null,
+  "note": null,
+  "np3": "EuroFilmBW_Vincent.NP3",
+  "images": [
+    "EuroFilmBW_Vincent.jpg"
+  ],
+  "recipeLink": "https://imagingcloud.nikon.com/recipe/detail/?recipeId=01JMB79P6AVGGQ6JEQNS9G1J0E"
+}

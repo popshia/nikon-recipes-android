@@ -1,0 +1,21 @@
+{
+  "id": "3DNDXH3TTESYYD5S52J694T8RB",
+  "name": "DG Film Look",
+  "slug": "dg-film-look-by-danny-gevirtz",
+  "category": "Nikon Creators",
+  "tags": null,
+  "description": null,
+  "author": "Danny Gevirtz",
+  "authorLink": null,
+  "whiteBalance": null,
+  "whiteBalanceShift": null,
+  "activeDLighting": null,
+  "evComp": null,
+  "grain": null,
+  "note": null,
+  "np3": "DGFilmLook_DannyG.NP3",
+  "images": [
+    "DGFilmLook_DannyG.jpg"
+  ],
+  "recipeLink": "https://imagingcloud.nikon.com/recipe/detail/?recipeId=01HXDGH58VHFJKHHPNX874W468"
+}

@@ -1,0 +1,21 @@
+{
+  "id": "8TDG282BFCT1PN0W1YSEFB0XGM",
+  "name": "Color Splash",
+  "slug": "color-splash-by-gilmar-smith",
+  "category": "Nikon Creators",
+  "tags": null,
+  "description": null,
+  "author": "Gilmar Smith",
+  "authorLink": null,
+  "whiteBalance": null,
+  "whiteBalanceShift": null,
+  "activeDLighting": null,
+  "evComp": null,
+  "grain": null,
+  "note": null,
+  "np3": "ColorSplash_Gilmar.NP3",
+  "images": [
+    "ColorSplash_Gilmar.jpg"
+  ],
+  "recipeLink": "https://imagingcloud.nikon.com/recipe/detail/?recipeId=01JD1NQAVKF14T5BB3QHK2VJN1"
+}
