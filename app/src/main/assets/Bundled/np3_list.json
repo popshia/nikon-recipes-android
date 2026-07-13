@@ -5810,6 +5810,40 @@
   "recipeLink": "https://imagingcloud.nikon.com/recipe/detail/?recipeId=01JMB79RCDTV9BNMVC6HSHE2A9"
  },
  {
+  "id": "GQB0W1YSE2QZE8HQBTKZC6R367",
+  "name": "Vision",
+  "slug": "vision-by-denis-zeqiri-filmstill",
+  "category": "Third Party Creator",
+  "tags": [
+   "Colour",
+   "Film Sim"
+  ],
+  "description": "VISION is inspired by modern motion picture film, featuring cool greens, soft contrast, and natural skin tones.",
+  "author": "Denis Zeqiri (filmstill__)",
+  "authorLink": "https://www.instagram.com/nikonrecipes/",
+  "whiteBalance": "Auto A1",
+  "whiteBalanceShift": null,
+  "activeDLighting": "Low",
+  "evComp": null,
+  "grain": null,
+  "note": null,
+  "np3": "np3/Third Party Creator/Denis Zeqiri (filmstill__)/Vision/Vision.NP3",
+  "images": [
+   "np3/Third Party Creator/Denis Zeqiri (filmstill__)/Vision/Vision-1.jpg",
+   "np3/Third Party Creator/Denis Zeqiri (filmstill__)/Vision/Vision-2.jpg",
+   "np3/Third Party Creator/Denis Zeqiri (filmstill__)/Vision/Vision-3.jpg",
+   "np3/Third Party Creator/Denis Zeqiri (filmstill__)/Vision/Vision-4.jpg",
+   "np3/Third Party Creator/Denis Zeqiri (filmstill__)/Vision/Vision-5.jpg",
+   "np3/Third Party Creator/Denis Zeqiri (filmstill__)/Vision/Vision-6.jpg",
+   "np3/Third Party Creator/Denis Zeqiri (filmstill__)/Vision/Vision-7.jpg",
+   "np3/Third Party Creator/Denis Zeqiri (filmstill__)/Vision/Vision-8.jpg",
+   "np3/Third Party Creator/Denis Zeqiri (filmstill__)/Vision/Vision-9.jpg",
+   "np3/Third Party Creator/Denis Zeqiri (filmstill__)/Vision/Vision-10.jpg",
+   "np3/Third Party Creator/Denis Zeqiri (filmstill__)/Vision/Vision-11.jpg"
+  ],
+  "recipeLink": "https://www.instagram.com/p/Danh4MwDRRS/?utm_source=ig_web_copy_link&igsh=NTc4MTIwNjQ2YQ=="
+ },
+ {
   "id": "2GEV2BTMVRG8YA6CHAKPFSEE19",
   "name": "Vitality Film",
   "slug": "vitality-film-by-peng-mango",

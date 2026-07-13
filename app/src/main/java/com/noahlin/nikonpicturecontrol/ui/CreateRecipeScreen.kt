@@ -108,7 +108,7 @@ fun CreateRecipeScreen(editId: String?, store: RecipeStore, nav: NavController) 
     var showTagPicker by remember { mutableStateOf(false) }
 
     val photoPicker = rememberLauncherForActivityResult(
-        ActivityResultContracts.PickMultipleVisualMedia(10),
+        ActivityResultContracts.PickMultipleVisualMedia(20),
     ) { uris ->
         images.clear()
         uris.forEach { images.add(ImageSource.Picked(it)) }

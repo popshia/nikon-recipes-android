@@ -2,15 +2,19 @@ package com.noahlin.nikonpicturecontrol.ui
 
 import android.content.Intent
 import android.net.Uri
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
@@ -19,6 +23,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Favorite
@@ -42,10 +47,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavController
 import com.noahlin.nikonpicturecontrol.RecipeStore
 import com.noahlin.nikonpicturecontrol.imageModels
@@ -56,6 +64,7 @@ fun DetailScreen(id: String, store: RecipeStore, nav: NavController) {
     val ctx = LocalContext.current
     val recipe = store.recipe(id) ?: return
     var note by remember(id) { mutableStateOf(store.note(recipe)) }
+    var fullScreenIndex by remember { mutableStateOf<Int?>(null) }
     val images = recipe.imageModels(ctx)
 
     Scaffold(
@@ -87,15 +96,19 @@ fun DetailScreen(id: String, store: RecipeStore, nav: NavController) {
             Modifier.padding(pad).verticalScroll(rememberScrollState()).padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp),
         ) {
-            // Image header: one fills width; several page horizontally.
+            // Image header: one fills width; several page horizontally. Tap to view fullscreen.
             if (images.size > 1) {
                 val pager = rememberPagerState { images.size }
                 HorizontalPager(state = pager, modifier = Modifier.fillMaxWidth()) { page ->
-                    SampleImage(images[page], Modifier.fillMaxWidth().heightIn(max = 360.dp),
+                    SampleImage(images[page],
+                        Modifier.fillMaxWidth().heightIn(max = 360.dp)
+                            .clickable { fullScreenIndex = page },
                         contentScale = ContentScale.Fit)
                 }
             } else if (images.size == 1) {
-                SampleImage(images[0], Modifier.fillMaxWidth().heightIn(max = 360.dp),
+                SampleImage(images[0],
+                    Modifier.fillMaxWidth().heightIn(max = 360.dp)
+                        .clickable { fullScreenIndex = 0 },
                     contentScale = ContentScale.Fit)
             }
 
@@ -162,6 +175,29 @@ fun DetailScreen(id: String, store: RecipeStore, nav: NavController) {
                     placeholder = { Text("Add a note…") },
                     modifier = Modifier.fillMaxWidth().heightIn(min = 96.dp),
                 )
+            }
+        }
+    }
+
+    fullScreenIndex?.let { start ->
+        FullScreenImageViewer(images, start) { fullScreenIndex = null }
+    }
+}
+
+/** Black-backed, paged fullscreen image viewer opened by tapping a sample. */
+@Composable
+private fun FullScreenImageViewer(images: List<Any>, start: Int, onClose: () -> Unit) {
+    Dialog(onDismissRequest = onClose, properties = DialogProperties(usePlatformDefaultWidth = false)) {
+        Box(Modifier.fillMaxSize().background(Color.Black)) {
+            val pager = rememberPagerState(initialPage = start) { images.size }
+            HorizontalPager(state = pager, modifier = Modifier.fillMaxSize()) { page ->
+                SampleImage(images[page], Modifier.fillMaxSize(), contentScale = ContentScale.Fit)
+            }
+            IconButton(
+                onClick = onClose,
+                modifier = Modifier.align(Alignment.TopEnd).statusBarsPadding().padding(8.dp),
+            ) {
+                Icon(Icons.Default.Close, contentDescription = "Close", tint = Color.White)
             }
         }
     }
