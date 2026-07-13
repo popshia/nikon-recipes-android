@@ -1,6 +1,17 @@
 package com.noahlin.nikonpicturecontrol.ui
 
 import android.net.Uri
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -42,10 +53,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -54,6 +67,8 @@ import com.noahlin.nikonpicturecontrol.Recipe
 import com.noahlin.nikonpicturecontrol.RecipeStore
 import com.noahlin.nikonpicturecontrol.firstImageModel
 import androidx.compose.ui.platform.LocalContext
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -65,6 +80,8 @@ fun LibraryScreen(store: RecipeStore, nav: NavController) {
     var favoritesOnly by remember { mutableStateOf(false) }
     var asCards by remember { mutableStateOf(true) }
     var showFilters by remember { mutableStateOf(false) }
+    var showRandom by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
 
     val hasFilter = category != null || tag != null || author != null || favoritesOnly
 
@@ -120,13 +137,21 @@ fun LibraryScreen(store: RecipeStore, nav: NavController) {
         },
         floatingActionButton = {
             FloatingActionButton(onClick = {
-                store.recipes.randomOrNull()?.let { nav.navigate("detail/${it.id}") }
+                if (showRandom) return@FloatingActionButton
+                val recipe = store.recipes.randomOrNull() ?: return@FloatingActionButton
+                showRandom = true
+                scope.launch {
+                    delay(1500)
+                    showRandom = false
+                    nav.navigate("detail/${recipe.id}")
+                }
             }) {
                 Icon(Icons.Default.Casino, contentDescription = "Random recipe")
             }
         },
     ) { pad ->
-        Column(Modifier.padding(pad).fillMaxSize()) {
+        Box(Modifier.padding(pad).fillMaxSize()) {
+        Column(Modifier.fillMaxSize()) {
             OutlinedTextField(
                 value = search,
                 onValueChange = { search = it },
@@ -152,6 +177,14 @@ fun LibraryScreen(store: RecipeStore, nav: NavController) {
                 }
             }
         }
+            AnimatedVisibility(
+                visible = showRandom,
+                enter = fadeIn() + scaleIn(initialScale = 0.87f),
+                exit = fadeOut(),
+            ) {
+                RandomRecipeOverlay()
+            }
+        }
     }
 
     if (showFilters) {
@@ -165,6 +198,45 @@ fun LibraryScreen(store: RecipeStore, nav: NavController) {
             onClear = { category = null; tag = null; author = null; favoritesOnly = false },
             onDismiss = { showFilters = false },
         )
+    }
+}
+
+/** Full-screen "rolling the dice" overlay shown briefly before opening a random recipe. */
+@Composable
+private fun RandomRecipeOverlay() {
+    val transition = rememberInfiniteTransition(label = "dice")
+    val angle by transition.animateFloat(
+        initialValue = 0f, targetValue = 360f,
+        animationSpec = infiniteRepeatable(tween(1200, easing = LinearEasing)),
+        label = "spin",
+    )
+    val pulse by transition.animateFloat(
+        initialValue = 1f, targetValue = 1.15f,
+        animationSpec = infiniteRepeatable(tween(650), RepeatMode.Reverse),
+        label = "pulse",
+    )
+    Box(
+        Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
+        contentAlignment = Alignment.Center,
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            Icon(
+                Icons.Default.Casino,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(96.dp).graphicsLayer {
+                    rotationZ = angle; scaleX = pulse; scaleY = pulse
+                },
+            )
+            Text(
+                "Feeling the mood for today...",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
     }
 }
 
