@@ -1,8 +1,7 @@
 package com.noahlin.nikonpicturecontrol.ui
 
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.MaterialExpressiveTheme
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
@@ -32,11 +31,10 @@ private val DarkColors = darkColorScheme(
     surfaceVariant = Color(0xFF2A2A2C),
 )
 
-/** Material 3 Expressive theme, seeded with the iOS gold accent. */
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+/** Stable Material 3 theme, seeded with the iOS gold accent. */
 @Composable
 fun NikonTheme(content: @Composable () -> Unit) {
-    MaterialExpressiveTheme(
+    MaterialTheme(
         colorScheme = if (isSystemInDarkTheme()) DarkColors else LightColors,
         content = content,
     )

@@ -14,8 +14,8 @@ android {
         applicationId = "com.noahlin.nikonpicturecontrol"
         minSdk = 26
         targetSdk = 36
-        versionCode = 2
-        versionName = "2.0"
+        versionCode = 3
+        versionName = "1.5"
     }
 
     buildTypes {
@@ -35,8 +35,8 @@ android {
 }
 
 dependencies {
-    // Alpha BOM: the only channel that ships Material 3 Expressive (material3 1.5.0-alpha).
-    val composeBom = platform("androidx.compose:compose-bom-alpha:2026.03.00")
+    // Stable Compose BOM (material3 1.4.0) — reliable, Play-Store-shippable.
+    val composeBom = platform("androidx.compose:compose-bom:2025.10.00")
     implementation(composeBom)
 
     implementation("androidx.core:core-ktx:1.13.1")
