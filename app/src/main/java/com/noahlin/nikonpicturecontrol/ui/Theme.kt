@@ -1,11 +1,15 @@
 package com.noahlin.nikonpicturecontrol.ui
 
+import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.dynamicDarkColorScheme
+import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 
 // Full Material 3 tonal scheme seeded from the iOS app's gold accent (#9C7D10),
 // so every role — primary, containers, surfaces, outline — is gold-harmonized
@@ -60,11 +64,22 @@ private val DarkColors = darkColorScheme(
     outlineVariant = Color(0xFF4D4639),
 )
 
-/** Material 3 theme, fully seeded with the iOS gold accent. */
+/** True when this device supports Material You dynamic (wallpaper-derived) color. */
+val supportsDynamicColor: Boolean = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+
+/**
+ * Material 3 theme, seeded with the iOS gold accent by default. If [dynamicColor] is enabled
+ * (an opt-in setting) and the device supports it (Android 12+), uses the wallpaper-derived
+ * Material You palette instead.
+ */
 @Composable
-fun NikonTheme(content: @Composable () -> Unit) {
-    MaterialTheme(
-        colorScheme = if (isSystemInDarkTheme()) DarkColors else LightColors,
-        content = content,
-    )
+fun NikonTheme(dynamicColor: Boolean = false, content: @Composable () -> Unit) {
+    val dark = isSystemInDarkTheme()
+    val colorScheme = when {
+        dynamicColor && supportsDynamicColor && dark -> dynamicDarkColorScheme(LocalContext.current)
+        dynamicColor && supportsDynamicColor -> dynamicLightColorScheme(LocalContext.current)
+        dark -> DarkColors
+        else -> LightColors
+    }
+    MaterialTheme(colorScheme = colorScheme, content = content)
 }

@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Camera
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -72,10 +72,15 @@ private fun Placeholder(modifier: Modifier) {
     }
 }
 
-/** Category pill: known bundled categories get stable colors; others a deterministic fallback. */
+/**
+ * Category pill, colored from the theme's own accent roles (primary/secondary/tertiary/error)
+ * instead of hand-picked RGB — stays correct and contrast-safe under any seed color, dynamic
+ * color included, in both light and dark. Known bundled categories get a stable assigned role;
+ * others fall back to a deterministic hash so the same name always gets the same color.
+ */
 @Composable
 fun CategoryChip(category: String) {
-    val fg = categoryColor(category, isSystemInDarkTheme())
+    val fg = categoryColor(category, MaterialTheme.colorScheme)
     Text(
         text = category,
         color = fg,
@@ -89,31 +94,21 @@ fun CategoryChip(category: String) {
     )
 }
 
-private val categoryPalette = mapOf(
-    "third party creator" to Triple(0.09, 0.35, 0.70),
-    "nikon creators" to Triple(0.04, 0.42, 0.31),
-    "nikon color grading" to Triple(0.04, 0.43, 0.58),
-    "color grading" to Triple(0.04, 0.43, 0.58),
+private val categoryRoles: Map<String, ColorScheme.() -> Color> = mapOf(
+    "third party creator" to { secondary },
+    "nikon creators" to { tertiary },
+    "nikon color grading" to { primary },
+    "color grading" to { primary },
 )
 
-private val categoryFallback = listOf(
-    Triple(0.65, 0.18, 0.30),
-    Triple(0.31, 0.37, 0.09),
-    Triple(0.12, 0.42, 0.50),
-    Triple(0.53, 0.26, 0.12),
-    Triple(0.38, 0.29, 0.62),
+private val categoryRoleFallback: List<ColorScheme.() -> Color> = listOf(
+    { primary }, { secondary }, { tertiary }, { error },
 )
 
-private fun categoryColor(category: String, dark: Boolean): Color {
+private fun categoryColor(category: String, scheme: ColorScheme): Color {
     val key = category.trim().lowercase()
-    val rgb = categoryPalette[key] ?: categoryFallback[key.sumOf { it.code } % categoryFallback.size]
-    // Base RGB is tuned for light mode; brighten on dark backgrounds so text stays readable.
-    val lift = if (dark) 0.42 else 0.0
-    return Color(
-        (rgb.first + lift).coerceAtMost(1.0).toFloat(),
-        (rgb.second + lift).coerceAtMost(1.0).toFloat(),
-        (rgb.third + lift).coerceAtMost(1.0).toFloat(),
-    )
+    val role = categoryRoles[key] ?: categoryRoleFallback[key.sumOf { it.code } % categoryRoleFallback.size]
+    return scheme.role()
 }
 
 /** Read-only dropdown selector with a "none" entry that maps to null. */

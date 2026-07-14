@@ -29,6 +29,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -54,7 +55,7 @@ import com.noahlin.nikonpicturecontrol.nilIfBlank
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreen(nav: NavController) {
+fun SettingsScreen(store: RecipeStore, nav: NavController) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -78,6 +79,20 @@ fun SettingsScreen(nav: NavController) {
             item {
                 SettingRow(Icons.AutoMirrored.Filled.HelpOutline, "How to add NP3 to Nikon cameras",
                     tint = MaterialTheme.colorScheme.primary) { nav.navigate("guide") }
+            }
+            if (supportsDynamicColor) {
+                item { HorizontalDivider(Modifier.padding(vertical = 8.dp)) }
+                item { SectionHeader("Appearance") }
+                item {
+                    Row(
+                        Modifier.fillMaxWidth().padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    ) {
+                        Text("Use wallpaper colors (Material You)", Modifier.weight(1f))
+                        Switch(checked = store.dynamicColorEnabled, onCheckedChange = store::setDynamicColor)
+                    }
+                }
             }
             item {
                 Text("Made by Noah Lin with 💛",

@@ -30,6 +30,13 @@ class RecipeStore(app: Application) : AndroidViewModel(app) {
     var extraCategories by mutableStateOf(prefs.getStringSet("extraCategories", emptySet())!!.toSet()); private set
     var extraTags by mutableStateOf(prefs.getStringSet("extraTags", emptySet())!!.toSet()); private set
 
+    var dynamicColorEnabled by mutableStateOf(prefs.getBoolean("dynamicColor", false)); private set
+
+    fun setDynamicColor(enabled: Boolean) {
+        dynamicColorEnabled = enabled
+        prefs.edit().putBoolean("dynamicColor", enabled).apply()
+    }
+
     private fun merged(): List<Recipe> =
         bundled.map { overrides[it.id] ?: it } + custom
 

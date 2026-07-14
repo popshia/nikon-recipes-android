@@ -27,9 +27,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            NikonTheme {
+            val store: RecipeStore = viewModel()
+            NikonTheme(dynamicColor = store.dynamicColorEnabled) {
                 Surface(Modifier) {
-                    val store: RecipeStore = viewModel()
                     val nav = rememberNavController()
                     NavHost(nav, startDestination = "library") {
                         composable("library") { LibraryScreen(store, nav) }
@@ -57,7 +57,7 @@ class MainActivity : ComponentActivity() {
                             CreateRecipeScreen(it.arguments!!.getString("id"), store, nav)
                         }
 
-                        composable("settings") { SettingsScreen(nav) }
+                        composable("settings") { SettingsScreen(store, nav) }
                         composable(
                             "terms/{kind}",
                             arguments = listOf(navArgument("kind") { type = NavType.StringType }),
