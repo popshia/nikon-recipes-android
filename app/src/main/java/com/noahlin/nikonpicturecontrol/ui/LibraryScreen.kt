@@ -212,10 +212,10 @@ fun LibraryScreen(store: RecipeStore, nav: NavController) {
                             color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 } else if (asCards) {
-                    // Adaptive column count: reflows from one column on phones to several on
-                    // tablets/foldables, instead of a fixed single-column card list.
+                    // Adaptive column count: one column on phones, reflowing to several on
+                    // tablets/foldables. minSize > half a phone's width keeps phones single-column.
                     LazyVerticalGrid(
-                        columns = GridCells.Adaptive(minSize = 180.dp),
+                        columns = GridCells.Adaptive(minSize = 300.dp),
                         contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 6.dp, bottom = 96.dp),
                         horizontalArrangement = Arrangement.spacedBy(14.dp),
                         verticalArrangement = Arrangement.spacedBy(14.dp),
