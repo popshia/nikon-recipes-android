@@ -18,6 +18,8 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -35,7 +37,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -139,15 +140,21 @@ fun DetailScreen(id: String, store: RecipeStore, nav: NavController) {
             }
 
             // Download / share
+            // Filled in the same gold as the library's random FAB (primaryContainer).
+            val ctaColors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            )
             if (recipe.np3 != null) {
-                OutlinedButton(onClick = { shareNp3(ctx, recipe) }, modifier = Modifier.fillMaxWidth()) {
+                Button(onClick = { shareNp3(ctx, recipe) }, modifier = Modifier.fillMaxWidth(), colors = ctaColors) {
                     Icon(Icons.Default.Download, contentDescription = null)
                     Spacer(Modifier.size(8.dp)); Text("Save / Share .NP3 File")
                 }
             } else recipe.recipeUrl?.let { url ->
-                OutlinedButton(
+                Button(
                     onClick = { ctx.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url))) },
                     modifier = Modifier.fillMaxWidth(),
+                    colors = ctaColors,
                 ) {
                     Icon(Icons.AutoMirrored.Filled.OpenInNew, contentDescription = null)
                     Spacer(Modifier.size(8.dp)); Text("Download from Creator")

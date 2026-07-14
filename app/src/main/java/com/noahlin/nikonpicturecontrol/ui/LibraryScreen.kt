@@ -19,7 +19,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -31,8 +30,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Casino
@@ -57,6 +58,7 @@ import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -108,18 +110,67 @@ fun LibraryScreen(store: RecipeStore, nav: NavController) {
         true
     }
 
+    Box(Modifier.fillMaxSize()) {
     Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Nikon Recipes") },
+                actions = {
+                    IconButton(onClick = { searchExpanded = true }) {
+                        Icon(Icons.Default.Search, contentDescription = "Search")
+                    }
+                    IconButton(onClick = { showFilters = true }) {
+                        Icon(
+                            Icons.Default.FilterList,
+                            contentDescription = "Filter",
+                            tint = if (hasFilter) MaterialTheme.colorScheme.primary
+                            else MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                    Box {
+                        IconButton(onClick = { showMenu = true }) {
+                            Icon(Icons.Default.MoreVert, contentDescription = "More options")
+                        }
+                        DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
+                            DropdownMenuItem(
+                                text = { Text(if (asCards) "List view" else "Card view") },
+                                leadingIcon = {
+                                    Icon(
+                                        if (asCards) Icons.AutoMirrored.Filled.List else Icons.Default.GridView,
+                                        contentDescription = null,
+                                    )
+                                },
+                                onClick = { asCards = !asCards; showMenu = false },
+                            )
+                            DropdownMenuItem(
+                                text = { Text("Create recipe") },
+                                leadingIcon = { Icon(Icons.Default.Add, contentDescription = null) },
+                                onClick = { showMenu = false; nav.navigate("create") },
+                            )
+                            DropdownMenuItem(
+                                text = { Text("Settings") },
+                                leadingIcon = { Icon(Icons.Default.Settings, contentDescription = null) },
+                                onClick = { showMenu = false; nav.navigate("settings") },
+                            )
+                        }
+                    }
+                },
+            )
+        },
         floatingActionButton = {
             if (!showRandom && !searchExpanded) {
-                FloatingActionButton(onClick = {
-                    val recipe = store.recipes.randomOrNull() ?: return@FloatingActionButton
-                    showRandom = true
-                    scope.launch {
-                        delay(1500)
-                        showRandom = false
-                        nav.navigate("detail/${recipe.id}")
-                    }
-                }) {
+                FloatingActionButton(
+                    shape = CircleShape,
+                    onClick = {
+                        val recipe = store.recipes.randomOrNull() ?: return@FloatingActionButton
+                        showRandom = true
+                        scope.launch {
+                            delay(1500)
+                            showRandom = false
+                            nav.navigate("detail/${recipe.id}")
+                        }
+                    },
+                ) {
                     Icon(Icons.Default.Casino, contentDescription = "Random recipe")
                 }
             }
@@ -127,79 +178,6 @@ fun LibraryScreen(store: RecipeStore, nav: NavController) {
     ) { pad ->
         Box(Modifier.padding(pad).fillMaxSize()) {
             Column(Modifier.fillMaxSize()) {
-                SearchBar(
-                    modifier = Modifier.fillMaxWidth(),
-                    // Scaffold already insets past the status bar, so don't double-pad here.
-                    windowInsets = WindowInsets(0, 0, 0, 0),
-                    expanded = searchExpanded,
-                    onExpandedChange = { searchExpanded = it },
-                    inputField = {
-                        SearchBarDefaults.InputField(
-                            query = search,
-                            onQueryChange = { search = it },
-                            onSearch = { searchExpanded = false },
-                            expanded = searchExpanded,
-                            onExpandedChange = { searchExpanded = it },
-                            placeholder = { Text("Search ${store.recipes.size} recipes") },
-                            leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
-                            trailingIcon = {
-                                if (searchExpanded) {
-                                    if (search.isNotEmpty()) {
-                                        IconButton(onClick = { search = "" }) {
-                                            Icon(Icons.Default.Close, contentDescription = "Clear")
-                                        }
-                                    }
-                                } else {
-                                    Row {
-                                        IconButton(onClick = { showFilters = true }) {
-                                            Icon(
-                                                Icons.Default.FilterList,
-                                                contentDescription = "Filter",
-                                                tint = if (hasFilter) MaterialTheme.colorScheme.primary
-                                                else MaterialTheme.colorScheme.onSurfaceVariant,
-                                            )
-                                        }
-                                        Box {
-                                            IconButton(onClick = { showMenu = true }) {
-                                                Icon(Icons.Default.MoreVert, contentDescription = "More options")
-                                            }
-                                            DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
-                                                DropdownMenuItem(
-                                                    text = { Text(if (asCards) "List view" else "Card view") },
-                                                    leadingIcon = {
-                                                        Icon(
-                                                            if (asCards) Icons.AutoMirrored.Filled.List else Icons.Default.GridView,
-                                                            contentDescription = null,
-                                                        )
-                                                    },
-                                                    onClick = { asCards = !asCards; showMenu = false },
-                                                )
-                                                DropdownMenuItem(
-                                                    text = { Text("Create recipe") },
-                                                    leadingIcon = { Icon(Icons.Default.Add, contentDescription = null) },
-                                                    onClick = { showMenu = false; nav.navigate("create") },
-                                                )
-                                                DropdownMenuItem(
-                                                    text = { Text("Settings") },
-                                                    leadingIcon = { Icon(Icons.Default.Settings, contentDescription = null) },
-                                                    onClick = { showMenu = false; nav.navigate("settings") },
-                                                )
-                                            }
-                                        }
-                                    }
-                                }
-                            },
-                        )
-                    },
-                ) {
-                    // Expanded: live search results.
-                    LazyColumn(contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)) {
-                        items(filtered, key = { it.id }) { recipe ->
-                            RecipeRow(recipe) { searchExpanded = false; nav.navigate("detail/${recipe.id}") }
-                        }
-                    }
-                }
-
                 Text(
                     "${filtered.size} of ${store.recipes.size} recipes",
                     style = MaterialTheme.typography.labelMedium,
@@ -243,6 +221,43 @@ fun LibraryScreen(store: RecipeStore, nav: NavController) {
                 RandomRecipeOverlay()
             }
         }
+    }
+    // Fullscreen search, opened from the top-bar search icon.
+    if (searchExpanded) {
+        SearchBar(
+            modifier = Modifier.align(Alignment.TopStart).fillMaxWidth(),
+            expanded = true,
+            onExpandedChange = { searchExpanded = it },
+            inputField = {
+                SearchBarDefaults.InputField(
+                    query = search,
+                    onQueryChange = { search = it },
+                    onSearch = {},
+                    expanded = true,
+                    onExpandedChange = { searchExpanded = it },
+                    placeholder = { Text("Search ${store.recipes.size} recipes") },
+                    leadingIcon = {
+                        IconButton(onClick = { searchExpanded = false }) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        }
+                    },
+                    trailingIcon = {
+                        if (search.isNotEmpty()) {
+                            IconButton(onClick = { search = "" }) {
+                                Icon(Icons.Default.Close, contentDescription = "Clear")
+                            }
+                        }
+                    },
+                )
+            },
+        ) {
+            LazyColumn(contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)) {
+                items(filtered, key = { it.id }) { recipe ->
+                    RecipeRow(recipe) { searchExpanded = false; nav.navigate("detail/${recipe.id}") }
+                }
+            }
+        }
+    }
     }
 
     if (showFilters) {
