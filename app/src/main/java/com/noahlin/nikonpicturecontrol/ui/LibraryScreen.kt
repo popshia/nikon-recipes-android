@@ -54,7 +54,6 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Surface
@@ -89,17 +88,16 @@ fun LibraryScreen(store: RecipeStore, nav: NavController, savedTab: Boolean = fa
     var category by remember { mutableStateOf<String?>(null) }
     var tag by remember { mutableStateOf<String?>(null) }
     var author by remember { mutableStateOf<String?>(null) }
-    var favoritesOnly by remember { mutableStateOf(false) }
     var asCards by remember { mutableStateOf(true) }
     var showFilters by remember { mutableStateOf(false) }
     var showRandom by remember { mutableStateOf(false) }
     var searchExpanded by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
-    val hasFilter = category != null || tag != null || author != null || favoritesOnly
+    val hasFilter = category != null || tag != null || author != null
 
     val filtered = store.recipes.filter { r ->
-        if ((favoritesOnly || savedTab) && !store.isFavorite(r.id)) return@filter false
+        if (savedTab && !store.isFavorite(r.id)) return@filter false
         category?.let { if (r.category != it) return@filter false }
         tag?.let { if (it !in r.tags) return@filter false }
         author?.let { if (r.author != it) return@filter false }
@@ -276,12 +274,11 @@ fun LibraryScreen(store: RecipeStore, nav: NavController, savedTab: Boolean = fa
     if (showFilters) {
         FilterSheet(
             store = store,
-            favoritesOnly = favoritesOnly, onFavoritesOnly = { favoritesOnly = it },
             category = category, onCategory = { category = it },
             tag = tag, onTag = { tag = it },
             author = author, onAuthor = { author = it },
             hasFilter = hasFilter,
-            onClear = { category = null; tag = null; author = null; favoritesOnly = false },
+            onClear = { category = null; tag = null; author = null },
             onDismiss = { showFilters = false },
         )
     }
@@ -410,7 +407,7 @@ private fun RecipeCard(recipe: Recipe, onClick: () -> Unit) {
 private fun RecipeRow(recipe: Recipe, onClick: () -> Unit) {
     val ctx = LocalContext.current
     Row(
-        Modifier.fillMaxWidth().clickable(onClick = onClick).padding(vertical = 6.dp),
+        Modifier.fillMaxWidth().clickable(onClick = onClick).padding(vertical = 8.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -433,7 +430,6 @@ private fun RecipeRow(recipe: Recipe, onClick: () -> Unit) {
 @Composable
 private fun FilterSheet(
     store: RecipeStore,
-    favoritesOnly: Boolean, onFavoritesOnly: (Boolean) -> Unit,
     category: String?, onCategory: (String?) -> Unit,
     tag: String?, onTag: (String?) -> Unit,
     author: String?, onAuthor: (String?) -> Unit,
@@ -443,10 +439,6 @@ private fun FilterSheet(
         Column(Modifier.padding(horizontal = 16.dp).padding(bottom = 24.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Text("Filter", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Text("Favorites Only", Modifier.weight(1f))
-                Switch(checked = favoritesOnly, onCheckedChange = onFavoritesOnly)
-            }
             LabeledDropdown("Category", "All Categories", store.categories, category, onCategory)
             LabeledDropdown("Tag", "All Tags", store.tags, tag, onTag)
             LabeledDropdown("Author", "All Authors", store.authors, author, onAuthor)

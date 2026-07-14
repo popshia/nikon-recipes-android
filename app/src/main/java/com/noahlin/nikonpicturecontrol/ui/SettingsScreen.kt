@@ -5,6 +5,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -26,14 +28,20 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LargeTopAppBar
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -56,69 +64,119 @@ import com.noahlin.nikonpicturecontrol.nilIfBlank
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(store: RecipeStore, nav: NavController) {
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            TopAppBar(
-                // Top-level tab (bottom nav) — no back arrow.
+            // Large collapsing title — the signature Android 12+ Settings header.
+            LargeTopAppBar(
                 title = { Text("Settings") },
                 scrollBehavior = scrollBehavior,
             )
         },
     ) { pad ->
-        LazyColumn(Modifier.padding(pad)) {
-            item { SectionHeader("Library") }
-            item { SettingRow(Icons.Default.GridView, "Edit Categories") { nav.navigate("terms/category") } }
-            item { SettingRow(Icons.Default.Sell, "Edit Tags") { nav.navigate("terms/tag") } }
-            item { HorizontalDivider(Modifier.padding(vertical = 8.dp)) }
+        LazyColumn(
+            Modifier.padding(pad),
+            contentPadding = PaddingValues(16.dp),
+            verticalArrangement = Arrangement.spacedBy(24.dp),
+        ) {
             item {
-                SettingRow(Icons.AutoMirrored.Filled.HelpOutline, "How to add NP3 to Nikon cameras",
-                    tint = MaterialTheme.colorScheme.primary) { nav.navigate("guide") }
-            }
-            if (supportsDynamicColor) {
-                item { HorizontalDivider(Modifier.padding(vertical = 8.dp)) }
-                item { SectionHeader("Appearance") }
-                item {
-                    Row(
-                        Modifier.fillMaxWidth().padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(16.dp),
-                    ) {
-                        Text("Use wallpaper colors (Material You)", Modifier.weight(1f))
-                        Switch(checked = store.dynamicColorEnabled, onCheckedChange = store::setDynamicColor)
-                    }
+                SettingsGroup("Library") {
+                    SettingListItem(Icons.Default.GridView, "Edit categories",
+                        "Rename or remove recipe categories") { nav.navigate("terms/category") }
+                    SettingDivider()
+                    SettingListItem(Icons.Default.Sell, "Edit tags",
+                        "Rename or remove tags") { nav.navigate("terms/tag") }
                 }
             }
             item {
-                Text("Made by Noah Lin with 💛",
-                    Modifier.fillMaxWidth().padding(top = 24.dp), textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant)
+                SettingsGroup("Help") {
+                    SettingListItem(Icons.AutoMirrored.Filled.HelpOutline,
+                        "How to add NP3 to Nikon cameras",
+                        "Step-by-step guide for your camera") { nav.navigate("guide") }
+                }
             }
+            if (supportsDynamicColor) {
+                item {
+                    SettingsGroup("Appearance") {
+                        SwitchListItem(
+                            title = "Use wallpaper colors",
+                            supporting = "Color the app from your wallpaper · Android 12+",
+                            checked = store.dynamicColorEnabled,
+                            onCheckedChange = store::setDynamicColor,
+                        )
+                    }
+                }
+            }
+            item { AppFooter() }
         }
     }
 }
 
+/** A titled group of settings wrapped in a rounded surface card (grouped-preferences style). */
 @Composable
-private fun SectionHeader(text: String) {
-    Text(text, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant,
-        modifier = Modifier.padding(16.dp, 16.dp, 16.dp, 4.dp))
+private fun SettingsGroup(title: String, content: @Composable ColumnScope.() -> Unit) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(
+            title,
+            style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.padding(start = 16.dp),
+        )
+        Surface(
+            shape = MaterialTheme.shapes.extraLarge,
+            color = MaterialTheme.colorScheme.surfaceContainer,
+            modifier = Modifier.fillMaxWidth(),
+            content = { Column(content = content) },
+        )
+    }
 }
 
 @Composable
-private fun SettingRow(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
-    label: String,
-    tint: Color = MaterialTheme.colorScheme.onSurface,
-    onClick: () -> Unit,
-) {
-    Row(
-        Modifier.fillMaxWidth().clickable(onClick = onClick).padding(16.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
+private fun SettingListItem(icon: ImageVector, title: String, supporting: String, onClick: () -> Unit) {
+    ListItem(
+        headlineContent = { Text(title) },
+        supportingContent = { Text(supporting) },
+        leadingContent = { Icon(icon, contentDescription = null) },
+        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+        modifier = Modifier.clickable(onClick = onClick),
+    )
+}
+
+/** Full-row-tappable switch item — tapping anywhere toggles it. */
+@Composable
+private fun SwitchListItem(title: String, supporting: String, checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
+    ListItem(
+        headlineContent = { Text(title) },
+        supportingContent = { Text(supporting) },
+        trailingContent = { Switch(checked = checked, onCheckedChange = null) },
+        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+        modifier = Modifier.clickable { onCheckedChange(!checked) },
+    )
+}
+
+/** Text-aligned divider between items inside a group card. */
+@Composable
+private fun SettingDivider() =
+    HorizontalDivider(Modifier.padding(start = 56.dp), color = MaterialTheme.colorScheme.outlineVariant)
+
+@Composable
+private fun AppFooter() {
+    val ctx = LocalContext.current
+    val version = remember {
+        runCatching { ctx.packageManager.getPackageInfo(ctx.packageName, 0).versionName }.getOrNull()
+    }
+    Column(
+        Modifier.fillMaxWidth().padding(top = 8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
-        Icon(icon, contentDescription = null, tint = tint)
-        Text(label, color = tint)
+        version?.let {
+            Text("Nikon Recipes $it", style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+        Text("Made by Noah Lin with 💛", style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
 
@@ -253,7 +311,7 @@ fun Np3GuideScreen(nav: NavController) {
             )
         },
     ) { pad ->
-        LazyColumn(Modifier.padding(pad).padding(16.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
+        LazyColumn(Modifier.padding(pad).padding(16.dp), verticalArrangement = Arrangement.spacedBy(24.dp)) {
             items(steps) { step ->
                 val index = steps.indexOf(step) + 1
                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {

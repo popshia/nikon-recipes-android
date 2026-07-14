@@ -90,7 +90,7 @@ fun CategoryChip(category: String) {
         modifier = Modifier
             .border(0.75.dp, fg.copy(alpha = 0.24f), RoundedCornerShape(50))
             .background(fg.copy(alpha = 0.13f), RoundedCornerShape(50))
-            .padding(horizontal = 8.dp, vertical = 3.dp),
+            .padding(horizontal = 8.dp, vertical = 4.dp),
     )
 }
 

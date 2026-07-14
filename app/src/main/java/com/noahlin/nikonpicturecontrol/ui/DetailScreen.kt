@@ -2,6 +2,8 @@ package com.noahlin.nikonpicturecontrol.ui
 
 import android.content.Intent
 import android.net.Uri
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -11,16 +13,14 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -30,29 +30,39 @@ import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.carousel.HorizontalMultiBrowseCarousel
+import androidx.compose.material3.carousel.rememberCarouselState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -71,51 +81,68 @@ fun DetailScreen(id: String, store: RecipeStore, nav: NavController) {
     val images = recipe.imageModels(ctx)
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
+    // Show the recipe name in the top bar only once the in-content headline scrolls under it,
+    // so the title isn't duplicated on screen at rest.
+    val scrollState = rememberScrollState()
+    val density = LocalDensity.current
+    val showBarTitle by remember {
+        derivedStateOf { scrollState.value > with(density) { 240.dp.roundToPx() } }
+    }
+
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             TopAppBar(
-                title = { Text(recipe.name, maxLines = 1) },
+                title = {
+                    androidx.compose.animation.AnimatedVisibility(
+                        visible = showBarTitle,
+                        enter = fadeIn(),
+                        exit = fadeOut(),
+                    ) {
+                        Text(recipe.name, maxLines = 1)
+                    }
+                },
                 scrollBehavior = scrollBehavior,
                 navigationIcon = {
                     IconButton(onClick = { nav.popBackStack() }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
-                actions = {
-                    IconButton(onClick = { nav.navigate("edit/$id") }) {
-                        Icon(Icons.Default.Edit, contentDescription = "Edit recipe")
-                    }
-                    IconButton(onClick = { store.toggleFavorite(id) }) {
-                        val fav = store.isFavorite(id)
-                        Icon(
-                            if (fav) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                            contentDescription = if (fav) "Remove from favorites" else "Add to favorites",
-                            tint = if (fav) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
-                        )
-                    }
-                },
             )
         },
     ) { pad ->
+      Box(Modifier.padding(pad).fillMaxSize()) {
         Column(
-            Modifier.padding(pad).verticalScroll(rememberScrollState()).padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp),
+            Modifier.verticalScroll(scrollState).padding(16.dp).padding(bottom = 96.dp),
+            verticalArrangement = Arrangement.spacedBy(24.dp),
         ) {
-            // Image header: one fills width; several page horizontally. Tap to view fullscreen.
-            if (images.size > 1) {
-                val pager = rememberPagerState { images.size }
-                HorizontalPager(state = pager, modifier = Modifier.fillMaxWidth()) { page ->
-                    SampleImage(images[page],
-                        Modifier.fillMaxWidth().heightIn(max = 360.dp)
-                            .clickable { fullScreenIndex = page },
-                        contentScale = ContentScale.Fit)
-                }
-            } else if (images.size == 1) {
-                SampleImage(images[0],
-                    Modifier.fillMaxWidth().heightIn(max = 360.dp)
+            // Image header. One sample → a single rounded hero; several → an M3 multi-browse
+            // carousel (large lead item with the next samples peeking). Tap any to view fullscreen.
+            val heroHeight = 280.dp
+            if (images.size == 1) {
+                SampleImage(
+                    images[0],
+                    Modifier.fillMaxWidth().height(heroHeight)
+                        .clip(MaterialTheme.shapes.extraLarge)
                         .clickable { fullScreenIndex = 0 },
-                    contentScale = ContentScale.Fit)
+                    contentScale = ContentScale.Crop,
+                )
+            } else if (images.size > 1) {
+                val carouselState = rememberCarouselState { images.size }
+                HorizontalMultiBrowseCarousel(
+                    state = carouselState,
+                    preferredItemWidth = 320.dp,
+                    itemSpacing = 8.dp,
+                    modifier = Modifier.fillMaxWidth().height(heroHeight),
+                ) { i ->
+                    SampleImage(
+                        images[i],
+                        Modifier.fillMaxSize()
+                            .maskClip(MaterialTheme.shapes.extraLarge)
+                            .clickable { fullScreenIndex = i },
+                        contentScale = ContentScale.Crop,
+                    )
+                }
             }
 
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -139,28 +166,6 @@ fun DetailScreen(id: String, store: RecipeStore, nav: NavController) {
                 }
             }
 
-            // Download / share
-            // Filled in the same gold as the library's random FAB (primaryContainer).
-            val ctaColors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-            )
-            if (recipe.np3 != null) {
-                Button(onClick = { shareNp3(ctx, recipe) }, modifier = Modifier.fillMaxWidth(), colors = ctaColors) {
-                    Icon(Icons.Default.Download, contentDescription = null)
-                    Spacer(Modifier.size(8.dp)); Text("Save / Share .NP3 File")
-                }
-            } else recipe.recipeUrl?.let { url ->
-                Button(
-                    onClick = { ctx.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url))) },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ctaColors,
-                ) {
-                    Icon(Icons.AutoMirrored.Filled.OpenInNew, contentDescription = null)
-                    Spacer(Modifier.size(8.dp)); Text("Download from Creator")
-                }
-            }
-
             recipe.description?.takeIf { it.isNotEmpty() }?.let {
                 Section("About") { Text(it, style = MaterialTheme.typography.bodyLarge) }
             }
@@ -170,7 +175,7 @@ fun DetailScreen(id: String, store: RecipeStore, nav: NavController) {
                     Column {
                         recipe.settings.forEachIndexed { i, (label, value) ->
                             if (i > 0) HorizontalDivider()
-                            Row(Modifier.fillMaxWidth().padding(vertical = 10.dp)) {
+                            Row(Modifier.fillMaxWidth().padding(vertical = 12.dp)) {
                                 Text(label, color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     modifier = Modifier.weight(1f))
                                 Text(value, style = MaterialTheme.typography.bodyMedium)
@@ -186,9 +191,61 @@ fun DetailScreen(id: String, store: RecipeStore, nav: NavController) {
                     onValueChange = { note = it; store.setNote(it, id) },
                     placeholder = { Text("Add a note…") },
                     modifier = Modifier.fillMaxWidth().heightIn(min = 96.dp),
+                    // No border — the section card already provides the container.
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Color.Transparent,
+                        unfocusedBorderColor = Color.Transparent,
+                    ),
                 )
             }
         }
+
+        // Floating toolbar (hand-rolled on stable APIs): a rounded pill of secondary actions
+        // (favourite + edit) beside a primary FAB (save/share the .NP3, or open the creator link).
+        val url = recipe.recipeUrl
+        val barHeight = 56.dp
+        Row(
+            modifier = Modifier.align(Alignment.BottomCenter).navigationBarsPadding().padding(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Surface(
+                shape = CircleShape,
+                color = MaterialTheme.colorScheme.surfaceContainer,
+                tonalElevation = 3.dp,
+                shadowElevation = 3.dp,
+                modifier = Modifier.height(barHeight),
+            ) {
+                Row(Modifier.padding(horizontal = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                    IconButton(onClick = { store.toggleFavorite(id) }) {
+                        val fav = store.isFavorite(id)
+                        Icon(
+                            if (fav) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                            contentDescription = if (fav) "Remove from favorites" else "Add to favorites",
+                            tint = if (fav) MaterialTheme.colorScheme.primary else LocalContentColor.current,
+                        )
+                    }
+                    IconButton(onClick = { nav.navigate("edit/$id") }) {
+                        Icon(Icons.Default.Edit, contentDescription = "Edit recipe")
+                    }
+                }
+            }
+            val fabModifier = Modifier.height(barHeight)
+            when {
+                recipe.np3 != null -> FloatingActionButton(
+                    onClick = { shareNp3(ctx, recipe) }, modifier = fabModifier,
+                ) {
+                    Icon(Icons.Default.Download, contentDescription = "Save / share .NP3 file")
+                }
+                url != null -> FloatingActionButton(
+                    onClick = { ctx.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url))) },
+                    modifier = fabModifier,
+                ) {
+                    Icon(Icons.AutoMirrored.Filled.OpenInNew, contentDescription = "Open in browser")
+                }
+            }
+        }
+      }
     }
 
     fullScreenIndex?.let { start ->
@@ -218,10 +275,16 @@ private fun FullScreenImageViewer(images: List<Any>, start: Int, onClose: () -> 
 @Composable
 private fun Section(title: String, content: @Composable () -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+        // Primary-coloured header + extra-large surfaceContainer card, matching Settings & Library.
+        Text(
+            title,
+            style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.padding(start = 4.dp),
+        )
         Card(
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-            shape = RoundedCornerShape(14.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
+            shape = MaterialTheme.shapes.extraLarge,
             modifier = Modifier.fillMaxWidth(),
         ) {
             Column(Modifier.padding(16.dp)) { content() }
