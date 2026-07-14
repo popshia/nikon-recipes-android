@@ -28,6 +28,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
@@ -208,14 +211,26 @@ fun LibraryScreen(store: RecipeStore, nav: NavController) {
                         Text("No recipes — try a different search or filter.",
                             color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
+                } else if (asCards) {
+                    // Adaptive column count: reflows from one column on phones to several on
+                    // tablets/foldables, instead of a fixed single-column card list.
+                    LazyVerticalGrid(
+                        columns = GridCells.Adaptive(minSize = 180.dp),
+                        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 6.dp, bottom = 96.dp),
+                        horizontalArrangement = Arrangement.spacedBy(14.dp),
+                        verticalArrangement = Arrangement.spacedBy(14.dp),
+                    ) {
+                        items(filtered, key = { it.id }) { recipe ->
+                            RecipeCard(recipe) { nav.navigate("detail/${recipe.id}") }
+                        }
+                    }
                 } else {
                     LazyColumn(
                         contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 6.dp, bottom = 96.dp),
-                        verticalArrangement = Arrangement.spacedBy(if (asCards) 14.dp else 4.dp),
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
                     ) {
                         items(filtered, key = { it.id }) { recipe ->
-                            if (asCards) RecipeCard(recipe) { nav.navigate("detail/${recipe.id}") }
-                            else RecipeRow(recipe) { nav.navigate("detail/${recipe.id}") }
+                            RecipeRow(recipe) { nav.navigate("detail/${recipe.id}") }
                         }
                     }
                 }

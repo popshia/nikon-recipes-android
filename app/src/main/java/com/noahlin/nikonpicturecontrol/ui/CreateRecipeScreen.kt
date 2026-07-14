@@ -37,6 +37,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -46,6 +47,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -106,6 +108,7 @@ fun CreateRecipeScreen(editId: String?, store: RecipeStore, nav: NavController) 
         mutableStateOf(existing?.np3?.let { n -> n.substringAfterLast('/').removePrefix("${existing.id}-") })
     }
     var showTagPicker by remember { mutableStateOf(false) }
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
     val photoPicker = rememberLauncherForActivityResult(
         ActivityResultContracts.PickMultipleVisualMedia(20),
@@ -165,6 +168,7 @@ fun CreateRecipeScreen(editId: String?, store: RecipeStore, nav: NavController) 
     }
 
     Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             TopAppBar(
                 title = { Text(if (existing == null) "New Recipe" else "Edit Recipe") },
@@ -178,6 +182,7 @@ fun CreateRecipeScreen(editId: String?, store: RecipeStore, nav: NavController) 
                         Icon(Icons.Default.Check, contentDescription = "Save")
                     }
                 },
+                scrollBehavior = scrollBehavior,
             )
         },
     ) { pad ->

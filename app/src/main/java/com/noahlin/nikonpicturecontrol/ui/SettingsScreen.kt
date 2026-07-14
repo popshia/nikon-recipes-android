@@ -18,12 +18,12 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.automirrored.filled.HelpOutline
 import androidx.compose.material.icons.filled.GridView
-import androidx.compose.material.icons.filled.HelpOutline
 import androidx.compose.material.icons.filled.Sell
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -32,6 +32,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -40,6 +41,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
@@ -53,7 +55,9 @@ import com.noahlin.nikonpicturecontrol.nilIfBlank
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(nav: NavController) {
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             TopAppBar(
                 title = { Text("Settings") },
@@ -62,6 +66,7 @@ fun SettingsScreen(nav: NavController) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
+                scrollBehavior = scrollBehavior,
             )
         },
     ) { pad ->
@@ -69,9 +74,9 @@ fun SettingsScreen(nav: NavController) {
             item { SectionHeader("Library") }
             item { SettingRow(Icons.Default.GridView, "Edit Categories") { nav.navigate("terms/category") } }
             item { SettingRow(Icons.Default.Sell, "Edit Tags") { nav.navigate("terms/tag") } }
-            item { Divider(Modifier.padding(vertical = 8.dp)) }
+            item { HorizontalDivider(Modifier.padding(vertical = 8.dp)) }
             item {
-                SettingRow(Icons.Default.HelpOutline, "How to add NP3 to Nikon cameras",
+                SettingRow(Icons.AutoMirrored.Filled.HelpOutline, "How to add NP3 to Nikon cameras",
                     tint = MaterialTheme.colorScheme.primary) { nav.navigate("guide") }
             }
             item {
@@ -123,7 +128,9 @@ fun EditTermsScreen(kind: String, store: RecipeStore, nav: NavController) {
     fun rename(old: String, new: String) =
         if (isCategory) store.renameCategory(old, new) else store.renameTag(old, new)
 
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             TopAppBar(
                 title = { Text(title) },
@@ -137,6 +144,7 @@ fun EditTermsScreen(kind: String, store: RecipeStore, nav: NavController) {
                         Icon(Icons.Default.Add, contentDescription = "Add $singular")
                     }
                 },
+                scrollBehavior = scrollBehavior,
             )
         },
     ) { pad ->
@@ -159,7 +167,7 @@ fun EditTermsScreen(kind: String, store: RecipeStore, nav: NavController) {
                                 tint = MaterialTheme.colorScheme.error)
                         }
                     }
-                    Divider()
+                    HorizontalDivider()
                 }
             }
         }
@@ -219,7 +227,9 @@ fun Np3GuideScreen(nav: NavController) {
         "Insert the memory card into the camera.",
         "On the camera, go to MANAGE PICTURE CONTROL → LOAD/SAVE → COPY TO CAMERA.",
     )
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             TopAppBar(
                 title = { Text("Install .NP3 Files") },
@@ -228,6 +238,7 @@ fun Np3GuideScreen(nav: NavController) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
+                scrollBehavior = scrollBehavior,
             )
         },
     ) { pad ->

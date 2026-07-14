@@ -134,7 +134,8 @@ fun LabeledDropdown(
             readOnly = true,
             label = { Text(label) },
             trailingIcon = { androidx.compose.material3.ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
-            modifier = Modifier.fillMaxWidth().menuAnchor(),
+            modifier = Modifier.fillMaxWidth()
+                .menuAnchor(androidx.compose.material3.ExposedDropdownMenuAnchorType.PrimaryNotEditable),
         )
         ExposedDropdownMenu(expanded, { expanded = false }) {
             androidx.compose.material3.DropdownMenuItem(
