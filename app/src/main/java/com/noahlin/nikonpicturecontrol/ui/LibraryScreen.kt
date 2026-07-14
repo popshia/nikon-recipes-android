@@ -30,7 +30,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -42,7 +41,6 @@ import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
@@ -58,8 +56,10 @@ import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -67,6 +67,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
@@ -82,7 +84,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LibraryScreen(store: RecipeStore, nav: NavController) {
+fun LibraryScreen(store: RecipeStore, nav: NavController, savedTab: Boolean = false) {
     var search by remember { mutableStateOf("") }
     var category by remember { mutableStateOf<String?>(null) }
     var tag by remember { mutableStateOf<String?>(null) }
@@ -92,13 +94,12 @@ fun LibraryScreen(store: RecipeStore, nav: NavController) {
     var showFilters by remember { mutableStateOf(false) }
     var showRandom by remember { mutableStateOf(false) }
     var searchExpanded by remember { mutableStateOf(false) }
-    var showMenu by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
     val hasFilter = category != null || tag != null || author != null || favoritesOnly
 
     val filtered = store.recipes.filter { r ->
-        if (favoritesOnly && !store.isFavorite(r.id)) return@filter false
+        if ((favoritesOnly || savedTab) && !store.isFavorite(r.id)) return@filter false
         category?.let { if (r.category != it) return@filter false }
         tag?.let { if (it !in r.tags) return@filter false }
         author?.let { if (r.author != it) return@filter false }
@@ -113,54 +114,24 @@ fun LibraryScreen(store: RecipeStore, nav: NavController) {
     Box(Modifier.fillMaxSize()) {
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Nikon Recipes") },
-                actions = {
-                    IconButton(onClick = { searchExpanded = true }) {
-                        Icon(Icons.Default.Search, contentDescription = "Search")
-                    }
-                    IconButton(onClick = { showFilters = true }) {
-                        Icon(
-                            Icons.Default.FilterList,
-                            contentDescription = "Filter",
-                            tint = if (hasFilter) MaterialTheme.colorScheme.primary
-                            else MaterialTheme.colorScheme.onSurfaceVariant,
+            // Saved tab gets a plain title bar; the Library tab uses a docked search bar (below).
+            if (savedTab) {
+                CenterAlignedTopAppBar(
+                    title = { Text("Saved") },
+                    actions = {
+                        LibraryActions(
+                            hasFilter = hasFilter, asCards = asCards,
+                            onToggleView = { asCards = !asCards },
+                            onFilter = { showFilters = true },
+                            onCreate = { nav.navigate("create") },
                         )
-                    }
-                    Box {
-                        IconButton(onClick = { showMenu = true }) {
-                            Icon(Icons.Default.MoreVert, contentDescription = "More options")
-                        }
-                        DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
-                            DropdownMenuItem(
-                                text = { Text(if (asCards) "List view" else "Card view") },
-                                leadingIcon = {
-                                    Icon(
-                                        if (asCards) Icons.AutoMirrored.Filled.List else Icons.Default.GridView,
-                                        contentDescription = null,
-                                    )
-                                },
-                                onClick = { asCards = !asCards; showMenu = false },
-                            )
-                            DropdownMenuItem(
-                                text = { Text("Create recipe") },
-                                leadingIcon = { Icon(Icons.Default.Add, contentDescription = null) },
-                                onClick = { showMenu = false; nav.navigate("create") },
-                            )
-                            DropdownMenuItem(
-                                text = { Text("Settings") },
-                                leadingIcon = { Icon(Icons.Default.Settings, contentDescription = null) },
-                                onClick = { showMenu = false; nav.navigate("settings") },
-                            )
-                        }
-                    }
-                },
-            )
+                    },
+                )
+            }
         },
         floatingActionButton = {
             if (!showRandom && !searchExpanded) {
                 FloatingActionButton(
-                    shape = CircleShape,
                     onClick = {
                         val recipe = store.recipes.randomOrNull() ?: return@FloatingActionButton
                         showRandom = true
@@ -178,25 +149,63 @@ fun LibraryScreen(store: RecipeStore, nav: NavController) {
     ) { pad ->
         Box(Modifier.padding(pad).fillMaxSize()) {
             Column(Modifier.fillMaxSize()) {
+                if (!savedTab) {
+                    // Docked M3 search bar: tapping the field opens the full-screen search view;
+                    // filter + overflow live inside the bar (Play Store / Photos pattern).
+                    Surface(
+                        onClick = { searchExpanded = true },
+                        shape = RoundedCornerShape(28.dp),
+                        color = MaterialTheme.colorScheme.surfaceContainerHigh,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                            .height(56.dp),
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Spacer(Modifier.size(16.dp))
+                            Icon(
+                                Icons.Default.Search, contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                            Spacer(Modifier.size(16.dp))
+                            Text(
+                                "Search ${store.recipes.size} recipes",
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.weight(1f),
+                            )
+                            LibraryActions(
+                                hasFilter = hasFilter, asCards = asCards,
+                                onToggleView = { asCards = !asCards },
+                                onFilter = { showFilters = true },
+                                onCreate = { nav.navigate("create") },
+                            )
+                        }
+                    }
+                }
                 Text(
                     "${filtered.size} of ${store.recipes.size} recipes",
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(start = 20.dp, top = 8.dp, bottom = 2.dp),
+                    modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 4.dp),
                 )
                 if (filtered.isEmpty()) {
                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text("No recipes — try a different search or filter.",
-                            color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(
+                            if (savedTab && search.isEmpty() && !hasFilter)
+                                "No saved recipes yet. Tap ♥ on a recipe to save it here."
+                            else "No recipes — try a different search or filter.",
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(horizontal = 32.dp),
+                        )
                     }
                 } else if (asCards) {
                     // Adaptive column count: one column on phones, reflowing to several on
                     // tablets/foldables. minSize > half a phone's width keeps phones single-column.
                     LazyVerticalGrid(
                         columns = GridCells.Adaptive(minSize = 300.dp),
-                        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 6.dp, bottom = 96.dp),
-                        horizontalArrangement = Arrangement.spacedBy(14.dp),
-                        verticalArrangement = Arrangement.spacedBy(14.dp),
+                        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 96.dp),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
                     ) {
                         items(filtered, key = { it.id }) { recipe ->
                             RecipeCard(recipe) { nav.navigate("detail/${recipe.id}") }
@@ -204,8 +213,8 @@ fun LibraryScreen(store: RecipeStore, nav: NavController) {
                     }
                 } else {
                     LazyColumn(
-                        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 6.dp, bottom = 96.dp),
-                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 96.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
                         items(filtered, key = { it.id }) { recipe ->
                             RecipeRow(recipe) { nav.navigate("detail/${recipe.id}") }
@@ -224,12 +233,16 @@ fun LibraryScreen(store: RecipeStore, nav: NavController) {
     }
     // Fullscreen search, opened from the top-bar search icon.
     if (searchExpanded) {
+        // Auto-focus the field so the keyboard shows the moment the search view opens.
+        val focusRequester = remember { FocusRequester() }
+        LaunchedEffect(Unit) { focusRequester.requestFocus() }
         SearchBar(
             modifier = Modifier.align(Alignment.TopStart).fillMaxWidth(),
             expanded = true,
             onExpandedChange = { searchExpanded = it },
             inputField = {
                 SearchBarDefaults.InputField(
+                    modifier = Modifier.focusRequester(focusRequester),
                     query = search,
                     onQueryChange = { search = it },
                     onSearch = {},
@@ -271,6 +284,48 @@ fun LibraryScreen(store: RecipeStore, nav: NavController) {
             onClear = { category = null; tag = null; author = null; favoritesOnly = false },
             onDismiss = { showFilters = false },
         )
+    }
+}
+
+/** Filter icon + overflow menu, shared by the docked search bar (Library) and the Saved title bar. */
+@Composable
+private fun LibraryActions(
+    hasFilter: Boolean,
+    asCards: Boolean,
+    onToggleView: () -> Unit,
+    onFilter: () -> Unit,
+    onCreate: () -> Unit,
+) {
+    IconButton(onClick = onFilter) {
+        Icon(
+            Icons.Default.FilterList,
+            contentDescription = "Filter",
+            tint = if (hasFilter) MaterialTheme.colorScheme.primary
+            else MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
+    var showMenu by remember { mutableStateOf(false) }
+    Box {
+        IconButton(onClick = { showMenu = true }) {
+            Icon(Icons.Default.MoreVert, contentDescription = "More options")
+        }
+        DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
+            DropdownMenuItem(
+                text = { Text(if (asCards) "List view" else "Card view") },
+                leadingIcon = {
+                    Icon(
+                        if (asCards) Icons.AutoMirrored.Filled.List else Icons.Default.GridView,
+                        contentDescription = null,
+                    )
+                },
+                onClick = { onToggleView(); showMenu = false },
+            )
+            DropdownMenuItem(
+                text = { Text("Create recipe") },
+                leadingIcon = { Icon(Icons.Default.Add, contentDescription = null) },
+                onClick = { showMenu = false; onCreate() },
+            )
+        }
     }
 }
 
@@ -318,9 +373,9 @@ private fun RecipeCard(recipe: Recipe, onClick: () -> Unit) {
     val ctx = LocalContext.current
     Card(
         onClick = onClick,
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        shape = MaterialTheme.shapes.extraLarge,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         modifier = Modifier.fillMaxWidth(),
     ) {
         SampleImage(

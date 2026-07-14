@@ -61,12 +61,8 @@ fun SettingsScreen(store: RecipeStore, nav: NavController) {
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             TopAppBar(
+                // Top-level tab (bottom nav) — no back arrow.
                 title = { Text("Settings") },
-                navigationIcon = {
-                    IconButton(onClick = { nav.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-                    }
-                },
                 scrollBehavior = scrollBehavior,
             )
         },
