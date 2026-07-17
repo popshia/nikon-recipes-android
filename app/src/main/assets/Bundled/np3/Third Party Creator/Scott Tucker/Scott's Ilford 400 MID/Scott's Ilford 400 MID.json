@@ -1,0 +1,43 @@
+{
+  "id": "KQ4N97THDCQ854J0DJ3GAS5JQ7",
+  "name": "Scott's Ilford 400 MID",
+  "slug": "scotts-ilford-400-mid-by-scott-tucker",
+  "category": "Third Party Creator",
+  "tags": [
+    "B&W",
+    "Ilford"
+  ],
+  "description": "Today I am sharing my first Picture Controls for Nikon Z cameras. These were specifically developed to be used on the Nikon Zf alongside the new Film Grain feature that came with firmware 3.0.",
+  "author": "Scott Tucker",
+  "authorLink": "https://www.instagram.com/scotttuckerphoto",
+  "whiteBalance": "10000K",
+  "whiteBalanceShift": null,
+  "activeDLighting": "Low",
+  "evComp": "+1/3",
+  "grain": "2M",
+  "note": null,
+  "np3": "Scott's Ilford 400 MID.NP3",
+  "images": [
+    "Scott's Ilford 400 MID-1.webp",
+    "Scott's Ilford 400 MID-2.webp",
+    "Scott's Ilford 400 MID-3.webp",
+    "Scott's Ilford 400 MID-4.webp",
+    "Scott's Ilford 400 MID-5.webp",
+    "Scott's Ilford 400 MID-6.webp",
+    "Scott's Ilford 400 MID-7.webp",
+    "Scott's Ilford 400 MID-8.webp",
+    "Scott's Ilford 400 MID-9.webp",
+    "Scott's Ilford 400 MID-10.webp",
+    "Scott's Ilford 400 MID-11.webp",
+    "Scott's Ilford 400 MID-12.webp",
+    "Scott's Ilford 400 MID-13.webp",
+    "Scott's Ilford 400 MID-14.webp",
+    "Scott's Ilford 400 MID-15.webp",
+    "Scott's Ilford 400 MID-16.webp",
+    "Scott's Ilford 400 MID-17.webp",
+    "Scott's Ilford 400 MID-18.webp",
+    "Scott's Ilford 400 MID-19.webp",
+    "Scott's Ilford 400 MID-20.webp"
+  ],
+  "recipeLink": "https://www.scotttuckerphoto.com/blog/scotts-ilford-400-film-recipe-for-nikon-z"
+}

@@ -10,10 +10,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.PhotoLibrary
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Shuffle
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.PhotoLibrary
-import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.outlined.Shuffle
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -34,12 +36,15 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.noahlin.nikonpicturecontrol.ui.AuthorScreen
+import com.noahlin.nikonpicturecontrol.ui.BrowseScreen
 import com.noahlin.nikonpicturecontrol.ui.CreateRecipeScreen
 import com.noahlin.nikonpicturecontrol.ui.DetailScreen
 import com.noahlin.nikonpicturecontrol.ui.EditTermsScreen
 import com.noahlin.nikonpicturecontrol.ui.LibraryScreen
 import com.noahlin.nikonpicturecontrol.ui.NikonTheme
 import com.noahlin.nikonpicturecontrol.ui.Np3GuideScreen
+import com.noahlin.nikonpicturecontrol.ui.RandomScreen
+import com.noahlin.nikonpicturecontrol.ui.SearchScreen
 import com.noahlin.nikonpicturecontrol.ui.SettingsScreen
 
 /** Top-level destinations shown in the bottom navigation bar. */
@@ -50,8 +55,9 @@ private enum class TopDest(
     val icon: ImageVector,
 ) {
     Library("library", "Library", Icons.Filled.PhotoLibrary, Icons.Outlined.PhotoLibrary),
-    Saved("saved", "Saved", Icons.Filled.Favorite, Icons.Outlined.FavoriteBorder),
-    Settings("settings", "Settings", Icons.Filled.Settings, Icons.Outlined.Settings),
+    Saved("saved", "Favorites", Icons.Filled.Favorite, Icons.Outlined.FavoriteBorder),
+    Random("random", "Random", Icons.Filled.Shuffle, Icons.Outlined.Shuffle),
+    Search("search", "Search", Icons.Filled.Search, Icons.Outlined.Search),
 }
 
 class MainActivity : ComponentActivity() {
@@ -75,7 +81,23 @@ class MainActivity : ComponentActivity() {
                         ) {
                             composable(TopDest.Library.route) { LibraryScreen(store, nav) }
                             composable(TopDest.Saved.route) { LibraryScreen(store, nav, savedTab = true) }
-                            composable(TopDest.Settings.route) { SettingsScreen(store, nav) }
+                            composable(TopDest.Random.route) { RandomScreen(store, nav) }
+                            composable(TopDest.Search.route) { SearchScreen(store, nav) }
+                            composable("settings") { SettingsScreen(store, nav) }
+
+                            composable(
+                                "browse/{kind}/{value}",
+                                arguments = listOf(
+                                    navArgument("kind") { type = NavType.StringType },
+                                    navArgument("value") { type = NavType.StringType },
+                                ),
+                            ) {
+                                BrowseScreen(
+                                    it.arguments!!.getString("kind")!!,
+                                    Uri.decode(it.arguments!!.getString("value")),
+                                    store, nav,
+                                )
+                            }
 
                             composable(
                                 "detail/{id}",

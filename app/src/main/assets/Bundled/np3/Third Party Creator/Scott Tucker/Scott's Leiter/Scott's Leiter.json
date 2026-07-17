@@ -1,0 +1,39 @@
+{
+  "id": "QXF9GWVV697ATBER6DNB82S63W",
+  "name": "Scott's Leiter",
+  "slug": "scotts-leiter-by-scott-tucker",
+  "category": "Third Party Creator",
+  "tags": [
+    "Colour",
+    "Kodak"
+  ],
+  "description": "Drawing inspiration from one of my favorite photographers of the 20th century, Saul Leiter, I present my take on the muted and deep color palate for which he was so well known.",
+  "author": "Scott Tucker",
+  "authorLink": "https://www.instagram.com/scotttuckerphoto",
+  "whiteBalance": "if the sun is up in the sky, use Direct Sunlight 0.0, 0.0 - if the sun has gone down, I use Cloudy - play with these to find your favorite",
+  "whiteBalanceShift": null,
+  "activeDLighting": "leave this to OFF unless it’s a VERY high contrast situation and my subject is in full shadow",
+  "evComp": "-0.3 to 0.0",
+  "grain": "1M",
+  "note": null,
+  "np3": "Scott's Leiter.NP3",
+  "images": [
+    "Scott's Leiter-1.webp",
+    "Scott's Leiter-2.webp",
+    "Scott's Leiter-3.webp",
+    "Scott's Leiter-4.webp",
+    "Scott's Leiter-5.webp",
+    "Scott's Leiter-6.webp",
+    "Scott's Leiter-7.webp",
+    "Scott's Leiter-8.webp",
+    "Scott's Leiter-9.webp",
+    "Scott's Leiter-10.webp",
+    "Scott's Leiter-11.webp",
+    "Scott's Leiter-12.webp",
+    "Scott's Leiter-13.webp",
+    "Scott's Leiter-14.webp",
+    "Scott's Leiter-15.webp",
+    "Scott's Leiter-16.webp"
+  ],
+  "recipeLink": "https://www.scotttuckerphoto.com/blog/scotts-leiter-film-recipe-for-nikon-z-cameras"
+}

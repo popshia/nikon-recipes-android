@@ -30,6 +30,8 @@ class RecipeStore(app: Application) : AndroidViewModel(app) {
     var extraCategories by mutableStateOf(prefs.getStringSet("extraCategories", emptySet())!!.toSet()); private set
     var extraTags by mutableStateOf(prefs.getStringSet("extraTags", emptySet())!!.toSet()); private set
 
+    var recentlySearchedIds by mutableStateOf(loadJsonStringList("recentlySearched")); private set
+
     var dynamicColorEnabled by mutableStateOf(prefs.getBoolean("dynamicColor", false)); private set
 
     fun setDynamicColor(enabled: Boolean) {
@@ -97,6 +99,22 @@ class RecipeStore(app: Application) : AndroidViewModel(app) {
 
     fun recipe(id: String): Recipe? = recipes.firstOrNull { it.id == id }
 
+    // MARK: Recently searched
+
+    /** IDs of recipes recently opened from Search, resolved to live recipes, newest first. */
+    val recentlySearched: List<Recipe>
+        get() = recentlySearchedIds.mapNotNull { recipe(it) }
+
+    fun addRecentlySearched(id: String) {
+        recentlySearchedIds = (listOf(id) + recentlySearchedIds.filter { it != id }).take(10)
+        prefs.edit().putString("recentlySearched", json.encodeToString(recentlySearchedIds)).apply()
+    }
+
+    fun clearRecentlySearched() {
+        recentlySearchedIds = emptyList()
+        prefs.edit().remove("recentlySearched").apply()
+    }
+
     /** Rename a category across every recipe that has it, or clear it if [name] is blank. */
     fun renameCategory(old: String, name: String) {
         val new = name.nilIfBlank()
@@ -158,6 +176,10 @@ class RecipeStore(app: Application) : AndroidViewModel(app) {
     private fun loadJsonMap(key: String): Map<String, Recipe> =
         prefs.getString(key, null)?.let { runCatching { json.decodeFromString<Map<String, Recipe>>(it) }.getOrNull() }
             ?: emptyMap()
+
+    private fun loadJsonStringList(key: String): List<String> =
+        prefs.getString(key, null)?.let { runCatching { json.decodeFromString<List<String>>(it) }.getOrNull() }
+            ?: emptyList()
 
     private fun loadJsonMapString(key: String): Map<String, String> =
         prefs.getString(key, null)?.let { runCatching { json.decodeFromString<Map<String, String>>(it) }.getOrNull() }
