@@ -22,6 +22,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.automirrored.filled.HelpOutline
 import androidx.compose.material.icons.filled.GridView
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Sell
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -29,6 +30,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
@@ -87,6 +89,34 @@ fun SettingsScreen(store: RecipeStore, nav: NavController) {
                     SettingDivider()
                     SettingListItem(Icons.Default.Sell, "Edit tags",
                         "Rename or remove tags") { nav.navigate("terms/tag") }
+                }
+            }
+            item {
+                SettingsGroup("Library sync") {
+                    ListItem(
+                        headlineContent = { Text("Fetch Latest Recipes") },
+                        supportingContent = { Text("Download new recipes from the cloud") },
+                        leadingContent = { Icon(Icons.Default.Refresh, contentDescription = null) },
+                        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+                        modifier = Modifier.clickable(enabled = !store.isFetching) { store.fetchLatest() },
+                    )
+                    if (store.isFetching) {
+                        if (store.prefetchTotal > 0) {
+                            LinearProgressIndicator(
+                                progress = { store.prefetchDone.toFloat() / store.prefetchTotal },
+                                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+                            )
+                        } else {
+                            LinearProgressIndicator(
+                                Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+                            )
+                        }
+                    }
+                    store.fetchError?.let {
+                        Text(it, style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 12.dp))
+                    }
                 }
             }
             item {

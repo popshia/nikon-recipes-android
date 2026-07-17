@@ -34,7 +34,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.noahlin.nikonpicturecontrol.RecipeStore
-import com.noahlin.nikonpicturecontrol.firstImageModel
+import com.noahlin.nikonpicturecontrol.thumbModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -90,7 +90,7 @@ fun AuthorScreen(author: String, store: RecipeStore, nav: NavController) {
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    SampleImage(recipe.firstImageModel(ctx),
+                    SampleImage(recipe.thumbModel(ctx),
                         Modifier.size(56.dp).clip(RoundedCornerShape(8.dp)))
                     Column {
                         Text(recipe.name, style = MaterialTheme.typography.titleMedium,

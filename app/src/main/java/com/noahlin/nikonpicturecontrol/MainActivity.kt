@@ -5,27 +5,40 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Shuffle
+import androidx.compose.material.icons.outlined.CloudOff
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.PhotoLibrary
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Shuffle
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -69,6 +82,10 @@ class MainActivity : ComponentActivity() {
             NikonTheme(dynamicColor = store.dynamicColorEnabled) {
                 Surface(Modifier) {
                     val nav = rememberNavController()
+                    // First launch (no cached index) fetches from R2; the gate below covers the UI
+                    // until the index + thumbnails are ready, so browsing never shows placeholders.
+                    LaunchedEffect(Unit) { if (!store.hasLibrary) store.fetchLatest() }
+                    Box(Modifier.fillMaxSize()) {
                     Scaffold(
                         bottomBar = { BottomBar(nav) },
                     ) { pad ->
@@ -131,6 +148,50 @@ class MainActivity : ComponentActivity() {
                             composable("guide") { Np3GuideScreen(nav) }
                         }
                     }
+                    if (!store.hasLibrary || store.isPreparingInitial) {
+                        LibraryGate(store)
+                    }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Full-screen cover shown on first launch while the index + thumbnails download from R2, and on
+ * failure (offline) with a retry — so the browse UI never appears empty or with placeholders.
+ */
+@Composable
+private fun LibraryGate(store: RecipeStore) {
+    Surface(Modifier.fillMaxSize()) {
+        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier.padding(40.dp),
+            ) {
+                if (store.isPreparingInitial) {
+                    CircularProgressIndicator()
+                    Text(
+                        if (store.prefetchTotal > 0) "Loading previews… ${store.prefetchDone}/${store.prefetchTotal}"
+                        else "Fetching recipes…",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                } else {
+                    Icon(
+                        Icons.Outlined.CloudOff, contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(48.dp),
+                    )
+                    Text("Couldn't load recipes", style = MaterialTheme.typography.titleMedium)
+                    store.fetchError?.let {
+                        Text(it, style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            textAlign = TextAlign.Center)
+                    }
+                    Button(onClick = { store.fetchLatest() }) { Text("Try Again") }
                 }
             }
         }

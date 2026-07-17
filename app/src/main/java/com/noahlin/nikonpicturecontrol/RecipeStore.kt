@@ -6,24 +6,49 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
+import coil.imageLoader
+import coil.request.CachePolicy
+import coil.request.ImageRequest
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import java.io.File
+import java.io.IOException
+import java.net.HttpURLConnection
+import java.net.URL
 
 private val json = Json { ignoreUnknownKeys = true; encodeDefaults = true }
 
 /**
- * Holds the recipe library: the bundled `np3_list.json` plus any recipes the user creates in-app.
- * State is exposed as Compose state; user data persists in SharedPreferences.
+ * Holds the recipe library: the index downloaded from Cloudflare R2 (cached on disk) plus any
+ * recipes the user creates in-app. State is exposed as Compose state; user data persists in
+ * SharedPreferences. The library is cloud-first — empty on first launch until [fetchLatest].
  */
 class RecipeStore(app: Application) : AndroidViewModel(app) {
     private val ctx: Context get() = getApplication()
     private val prefs = app.getSharedPreferences("recipes", Context.MODE_PRIVATE)
 
-    private val bundled: List<Recipe> = loadBundled()
+    /** The main library, loaded from the locally-cached index and refreshed from R2. */
+    private var library by mutableStateOf(loadIndexCache())
     private var custom: List<Recipe> = loadJsonList("custom")
     private var overrides: Map<String, Recipe> = loadJsonMap("overrides")
 
     var recipes by mutableStateOf(merged()); private set
+
+    // Remote-sync state, observed by the UI.
+    var isFetching by mutableStateOf(false); private set
+    /** True while the first-launch fetch runs (no cached library yet) — drives the full-screen gate. */
+    var isPreparingInitial by mutableStateOf(false); private set
+    var fetchError by mutableStateOf<String?>(null); private set
+    var prefetchDone by mutableStateOf(0); private set
+    var prefetchTotal by mutableStateOf(0); private set
+    val hasLibrary: Boolean get() = library.isNotEmpty()
 
     var favorites by mutableStateOf(prefs.getStringSet("favorites", emptySet())!!.toSet()); private set
     var userNotes by mutableStateOf(loadJsonMapString("userNotes")); private set
@@ -40,7 +65,7 @@ class RecipeStore(app: Application) : AndroidViewModel(app) {
     }
 
     private fun merged(): List<Recipe> =
-        bundled.map { overrides[it.id] ?: it } + custom
+        library.map { overrides[it.id] ?: it } + custom
 
     // MARK: Favorites
 
@@ -161,13 +186,89 @@ class RecipeStore(app: Application) : AndroidViewModel(app) {
             )
         }
 
-    // MARK: Persistence
+    // MARK: Remote sync (Cloudflare R2)
 
-    private fun loadBundled(): List<Recipe> =
-        runCatching {
-            ctx.assets.open("Bundled/np3_list.json").use { it.readBytes().decodeToString() }
-                .let { json.decodeFromString<List<Recipe>>(it) }
-        }.getOrDefault(emptyList())
+    /** Locally-cached copy of the index, refreshed by [fetchLatest]. */
+    private fun indexCacheFile(): File = File(ctx.filesDir, "np3_list.json")
+
+    private fun loadIndexCache(): List<Recipe> =
+        indexCacheFile().takeIf { it.exists() }
+            ?.let { runCatching { json.decodeFromString<List<Recipe>>(it.readText()) }.getOrNull() }
+            ?: emptyList()
+
+    /**
+     * Download the latest index from R2, cache it, refresh the library, and prefetch every list
+     * thumbnail so browsing has no placeholders. Safe to call repeatedly (re-entrancy guarded).
+     */
+    fun fetchLatest() {
+        if (isFetching) return
+        isFetching = true
+        isPreparingInitial = library.isEmpty()
+        fetchError = null
+        viewModelScope.launch {
+            try {
+                val body = withContext(Dispatchers.IO) { httpGet(Recipe.INDEX_URL) }
+                val list = json.decodeFromString<List<Recipe>>(body)
+                // ponytail: iOS evicts stale caches by comparing per-recipe assetHash, but the R2
+                // index emits no assetHash yet, so eviction is inert — skip until hashes land.
+                withContext(Dispatchers.IO) { indexCacheFile().writeText(body) }
+                library = list
+                recipes = merged()
+                prefetchThumbnails()
+            } catch (e: Exception) {
+                fetchError = e.message ?: "Couldn't load recipes"
+            } finally {
+                isFetching = false
+                isPreparingInitial = false
+            }
+        }
+    }
+
+    private fun httpGet(urlStr: String): String {
+        val conn = (URL(urlStr).openConnection() as HttpURLConnection).apply {
+            connectTimeout = 15_000; readTimeout = 20_000; requestMethod = "GET"
+        }
+        try {
+            if (conn.responseCode >= 400) throw IOException("Server returned ${conn.responseCode}")
+            return conn.inputStream.bufferedReader().use { it.readText() }
+        } finally {
+            conn.disconnect()
+        }
+    }
+
+    /** Warm Coil's disk cache for every *not-yet-cached* remote list thumbnail (8 at a time). */
+    private suspend fun prefetchThumbnails() {
+        val loader = ctx.imageLoader
+        val diskCache = loader.diskCache
+        // thumbModel returns a String for remote assets, a File for local (custom) ones — prefetch
+        // only remote ones we don't already have on disk (mirrors iOS's isRemoteImageCached check).
+        val urls = recipes.mapNotNull { it.thumbModel(ctx) as? String }
+            .filter { url -> diskCache?.openSnapshot(url)?.use { } == null }
+        prefetchTotal = urls.size
+        prefetchDone = 0
+        urls.chunked(8).forEach { slice ->
+            coroutineScope {
+                slice.map { url ->
+                    // Warm the disk cache only: tiny decode, no memory-cache churn (we're caching 246
+                    // images, not displaying them). Swallow per-image failures so one bad thumbnail
+                    // can't sink the whole load.
+                    async(Dispatchers.IO) {
+                        runCatching {
+                            loader.execute(
+                                ImageRequest.Builder(ctx).data(url)
+                                    .size(64)
+                                    .memoryCachePolicy(CachePolicy.DISABLED)
+                                    .build(),
+                            )
+                        }
+                    }
+                }.awaitAll()
+            }
+            prefetchDone = minOf(prefetchDone + slice.size, prefetchTotal)
+        }
+    }
+
+    // MARK: Persistence
 
     private fun loadJsonList(key: String): List<Recipe> =
         prefs.getString(key, null)?.let { runCatching { json.decodeFromString<List<Recipe>>(it) }.getOrNull() }

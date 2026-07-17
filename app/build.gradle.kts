@@ -14,8 +14,8 @@ android {
         applicationId = "com.noahlin.nikonpicturecontrol"
         minSdk = 26
         targetSdk = 36
-        versionCode = 16
-        versionName = "4.0"
+        versionCode = 17
+        versionName = "4.1"
     }
 
     buildTypes {
@@ -30,8 +30,6 @@ android {
     }
     kotlinOptions { jvmTarget = "17" }
     buildFeatures { compose = true }
-    // Don't compress the bundled .NP3 files — we open them straight from assets.
-    androidResources { noCompress += "NP3" }
 }
 
 dependencies {

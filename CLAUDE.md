@@ -5,8 +5,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## What this is
 
 Native Android / Jetpack Compose (Material 3) port of the iOS Nikon Flexible Picture Controls app.
-Bundles the community recipe library offline: browse, search, filter, view samples + recommended
-settings, create your own recipes, and share each `.NP3` file via the system share sheet.
+Browse, search, filter, view samples + recommended settings, create your own recipes, and share
+each `.NP3` file via the system share sheet. The community recipe library is **cloud-hosted on
+Cloudflare R2** (not bundled) — see the Data section.
 
 ## Build & run
 
@@ -21,27 +22,31 @@ Requires JDK 17 and an Android device/emulator (minSdk 26 / Android 8.0, target/
 
 There is no test suite in this repo — verify changes by running the app.
 
-## Data: the bundled recipe library
+## Data: the cloud-hosted recipe library
 
-The recipe library is the **same source data as the iOS app**, copied verbatim into
-`app/src/main/assets/Bundled/` (`np3_list.json` + per-recipe folders, each with a `.jpg`, `.json`,
-and `.NP3`). To refresh it, re-run the iOS repo's `Scripts/build_np3_list.py`, then copy
-`NikonPictureControl/Bundled/` over `app/src/main/assets/Bundled/`.
+The app ships with **no recipe data** and streams the library from Cloudflare R2 — the same
+bucket the iOS app uses (`Recipe.IMAGE_BASE_URL`). On first launch `RecipeStore.fetchLatest()`
+downloads the index (`<base>/np3_list.json`) into internal storage, caches it, and prefetches
+every list thumbnail (behind the `LibraryGate` in `MainActivity`). Full images and `.NP3` files
+stream on demand; Coil disk-caches images, and cloud `.NP3`s download to `cache/NP3/<id>/` when
+shared. Settings → **Fetch Latest Recipes** re-pulls the index, so new recipes appear with no app
+rebuild. There is no data to copy from the iOS repo — both apps point at the same R2 URLs.
 
-`np3_list.json` paths are relative to `Bundled/`, so `assets/Bundled/<path>` resolves each
-`.NP3`/image — identical to the iOS bundle layout. `.NP3` files are excluded from asset
-compression (`androidResources.noCompress`) since they're opened straight from assets.
+Index/asset schema: each recipe carries relative asset paths (`images`, `thumb`, `np3`); a remote
+URL is `IMAGE_BASE_URL + path` with segments percent-encoded (paths contain spaces). `assetHash`
+is reserved for future cache eviction (the index does not emit it yet).
 
 ## Architecture
 
 - **`Recipe.kt`** — the data model (`@Serializable`, decodes `np3_list.json` directly) plus
   asset/file path resolution for Coil. `imageModel()` is the key indirection: a custom recipe's
-  flat file in internal storage wins over the bundled asset path — this is what lets user-created
-  and bundled recipes share the same image-loading code path.
-- **`RecipeStore.kt`** — the single `AndroidViewModel` and single source of truth. Loads bundled
-  recipes from `np3_list.json` once; holds custom (user-created) recipes and per-recipe
-  `overrides` as separate lists, merged on read (`merged()`): `bundled.map { overrides[it.id] ?: it } + custom`.
-  Editing a bundled recipe never mutates the bundled JSON — it creates an override entry instead.
+  flat file in internal storage wins; otherwise it resolves to the remote R2 URL — so user-created
+  and cloud recipes share one image-loading path. `thumbModel()`/`np3Model()` layer on top.
+- **`RecipeStore.kt`** — the single `AndroidViewModel` and single source of truth. Loads the
+  `library` from the cached index (empty on first launch) and refreshes it from R2 via
+  `fetchLatest()` (+ `prefetchThumbnails()`); holds custom (user-created) recipes and per-recipe
+  `overrides` as separate lists, merged on read (`merged()`): `library.map { overrides[it.id] ?: it } + custom`.
+  Editing a library recipe never mutates the index — it creates an override entry instead.
   Favorites, notes, and extra categories/tags persist to `SharedPreferences` as JSON
   (kotlinx.serialization); custom recipe assets live in internal storage
   (`Context.recipeAssetsDir()`), not cache, so they survive.

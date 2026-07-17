@@ -44,10 +44,15 @@ import androidx.core.content.FileProvider
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.noahlin.nikonpicturecontrol.Recipe
-import com.noahlin.nikonpicturecontrol.firstImageModel
+import com.noahlin.nikonpicturecontrol.thumbModel
 import com.noahlin.nikonpicturecontrol.imageModel
+import com.noahlin.nikonpicturecontrol.np3Model
 import com.noahlin.nikonpicturecontrol.recipeAssetsDir
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.File
+import java.net.HttpURLConnection
+import java.net.URL
 
 /** Sample image loaded off-thread by Coil, with a gradient placeholder fallback. */
 @Composable
@@ -172,7 +177,7 @@ fun RecipeCard(recipe: Recipe, modifier: Modifier = Modifier, onClick: () -> Uni
         modifier = modifier.fillMaxWidth(),
     ) {
         SampleImage(
-            recipe.firstImageModel(ctx),
+            recipe.thumbModel(ctx),
             modifier = Modifier.fillMaxWidth().height(200.dp),
         )
         Column(Modifier.padding(12.dp)) {
@@ -209,7 +214,7 @@ fun RecipeRow(recipe: Recipe, onClick: () -> Unit) {
         verticalAlignment = Alignment.CenterVertically,
     ) {
         SampleImage(
-            recipe.firstImageModel(ctx),
+            recipe.thumbModel(ctx),
             modifier = Modifier.size(56.dp).clip(RoundedCornerShape(8.dp)),
         )
         Column {
@@ -229,7 +234,7 @@ fun RailCard(recipe: Recipe, onClick: () -> Unit) {
     val ctx = LocalContext.current
     Column(Modifier.width(160.dp).clickable(onClick = onClick)) {
         SampleImage(
-            recipe.firstImageModel(ctx),
+            recipe.thumbModel(ctx),
             modifier = Modifier.width(160.dp).height(115.dp).clip(RoundedCornerShape(12.dp)),
         )
         Text(recipe.name, style = MaterialTheme.typography.bodyMedium,
@@ -243,19 +248,32 @@ fun RailCard(recipe: Recipe, onClick: () -> Unit) {
 }
 
 /**
- * Share a recipe's `.NP3` via the system share sheet. Custom files are shared straight from the
- * assets dir; bundled ones are staged into cache first (assets have no shareable file path).
+ * Share a recipe's `.NP3` via the system share sheet. A custom recipe's file is shared straight
+ * from internal storage; a cloud recipe's file is downloaded from R2 into cache once (keeping its
+ * real filename so the share sheet names it right), then shared. Suspends for the download.
  */
-fun shareNp3(context: Context, recipe: Recipe) {
+suspend fun shareNp3(context: Context, recipe: Recipe) {
     val name = recipe.np3 ?: return
-    val file: File = File(context.recipeAssetsDir(), name).takeIf { it.exists() } ?: run {
-        val dest = File(context.cacheDir, "shared").apply { mkdirs() }
-            .let { File(it, name.substringAfterLast('/')) }
-        context.assets.open("Bundled/$name").use { input ->
-            dest.outputStream().use { input.copyTo(it) }
+    val custom = File(context.recipeAssetsDir(), name).takeIf { it.exists() }
+    val file: File = custom ?: withContext(Dispatchers.IO) {
+        val dir = File(context.cacheDir, "NP3/${recipe.id}").apply { mkdirs() }
+        val dest = File(dir, name.substringAfterLast('/'))
+        if (!dest.exists()) {
+            val url = recipe.np3Model(context) as? String ?: return@withContext null
+            val conn = (URL(url).openConnection() as HttpURLConnection).apply {
+                connectTimeout = 15_000; readTimeout = 20_000
+            }
+            try {
+                if (conn.responseCode >= 400) return@withContext null
+                conn.inputStream.use { input -> dest.outputStream().use { input.copyTo(it) } }
+            } catch (e: Exception) {
+                return@withContext null
+            } finally {
+                conn.disconnect()
+            }
         }
         dest
-    }
+    } ?: return
     val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
     val intent = Intent(Intent.ACTION_SEND).apply {
         type = "application/octet-stream"

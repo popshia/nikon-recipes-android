@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <paths>
-    <!-- Where we stage .NP3 files before sharing them via the system share sheet. -->
-    <cache-path name="shared" path="shared/" />
+    <!-- Where cloud .NP3 files are downloaded before sharing them via the system share sheet. -->
+    <cache-path name="np3" path="NP3/" />
     <files-path name="assets" path="RecipeLibrary/" />
 </paths>

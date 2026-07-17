@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -33,6 +34,7 @@ import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.carousel.HorizontalMultiBrowseCarousel
 import androidx.compose.material3.carousel.rememberCarouselState
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -53,6 +55,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -70,6 +73,7 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavController
 import com.noahlin.nikonpicturecontrol.RecipeStore
 import com.noahlin.nikonpicturecontrol.imageModels
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -78,6 +82,8 @@ fun DetailScreen(id: String, store: RecipeStore, nav: NavController) {
     val recipe = store.recipe(id) ?: return
     var note by remember(id) { mutableStateOf(store.note(recipe)) }
     var fullScreenIndex by remember { mutableStateOf<Int?>(null) }
+    var preparingNp3 by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
     val images = recipe.imageModels(ctx)
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
@@ -233,9 +239,24 @@ fun DetailScreen(id: String, store: RecipeStore, nav: NavController) {
             val fabModifier = Modifier.height(barHeight)
             when {
                 recipe.np3 != null -> FloatingActionButton(
-                    onClick = { shareNp3(ctx, recipe) }, modifier = fabModifier,
+                    onClick = {
+                        if (!preparingNp3) scope.launch {
+                            preparingNp3 = true
+                            shareNp3(ctx, recipe)
+                            preparingNp3 = false
+                        }
+                    },
+                    modifier = fabModifier,
                 ) {
-                    Icon(Icons.Default.Download, contentDescription = "Save / share .NP3 file")
+                    if (preparingNp3) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(24.dp),
+                            color = LocalContentColor.current,
+                            strokeWidth = 2.dp,
+                        )
+                    } else {
+                        Icon(Icons.Default.Download, contentDescription = "Save / share .NP3 file")
+                    }
                 }
                 url != null -> FloatingActionButton(
                     onClick = { ctx.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url))) },
