@@ -101,16 +101,9 @@ fun SettingsScreen(store: RecipeStore, nav: NavController) {
                         modifier = Modifier.clickable(enabled = !store.isFetching) { store.fetchLatest() },
                     )
                     if (store.isFetching) {
-                        if (store.prefetchTotal > 0) {
-                            LinearProgressIndicator(
-                                progress = { store.prefetchDone.toFloat() / store.prefetchTotal },
-                                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
-                            )
-                        } else {
-                            LinearProgressIndicator(
-                                Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
-                            )
-                        }
+                        LinearProgressIndicator(
+                            Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+                        )
                     }
                     store.fetchError?.let {
                         Text(it, style = MaterialTheme.typography.bodySmall,

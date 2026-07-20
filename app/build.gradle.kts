@@ -14,8 +14,8 @@ android {
         applicationId = "com.noahlin.nikonpicturecontrol"
         minSdk = 26
         targetSdk = 36
-        versionCode = 17
-        versionName = "4.1"
+        versionCode = 18
+        versionName = "4.1.1"
     }
 
     buildTypes {

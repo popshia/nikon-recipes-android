@@ -7,13 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import coil.imageLoader
-import coil.request.CachePolicy
-import coil.request.ImageRequest
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
@@ -46,8 +40,6 @@ class RecipeStore(app: Application) : AndroidViewModel(app) {
     /** True while the first-launch fetch runs (no cached library yet) — drives the full-screen gate. */
     var isPreparingInitial by mutableStateOf(false); private set
     var fetchError by mutableStateOf<String?>(null); private set
-    var prefetchDone by mutableStateOf(0); private set
-    var prefetchTotal by mutableStateOf(0); private set
     val hasLibrary: Boolean get() = library.isNotEmpty()
 
     var favorites by mutableStateOf(prefs.getStringSet("favorites", emptySet())!!.toSet()); private set
@@ -197,8 +189,9 @@ class RecipeStore(app: Application) : AndroidViewModel(app) {
             ?: emptyList()
 
     /**
-     * Download the latest index from R2, cache it, refresh the library, and prefetch every list
-     * thumbnail so browsing has no placeholders. Safe to call repeatedly (re-entrancy guarded).
+     * Download the latest index from R2, cache it, and refresh the library. The gate waits only on
+     * the index — thumbnails and full images stream in on demand (Coil disk-caches each as it's
+     * shown). Safe to call repeatedly (re-entrancy guarded).
      */
     fun fetchLatest() {
         if (isFetching) return
@@ -214,7 +207,6 @@ class RecipeStore(app: Application) : AndroidViewModel(app) {
                 withContext(Dispatchers.IO) { indexCacheFile().writeText(body) }
                 library = list
                 recipes = merged()
-                prefetchThumbnails()
             } catch (e: Exception) {
                 fetchError = e.message ?: "Couldn't load recipes"
             } finally {
@@ -233,38 +225,6 @@ class RecipeStore(app: Application) : AndroidViewModel(app) {
             return conn.inputStream.bufferedReader().use { it.readText() }
         } finally {
             conn.disconnect()
-        }
-    }
-
-    /** Warm Coil's disk cache for every *not-yet-cached* remote list thumbnail (8 at a time). */
-    private suspend fun prefetchThumbnails() {
-        val loader = ctx.imageLoader
-        val diskCache = loader.diskCache
-        // thumbModel returns a String for remote assets, a File for local (custom) ones — prefetch
-        // only remote ones we don't already have on disk (mirrors iOS's isRemoteImageCached check).
-        val urls = recipes.mapNotNull { it.thumbModel(ctx) as? String }
-            .filter { url -> diskCache?.openSnapshot(url)?.use { } == null }
-        prefetchTotal = urls.size
-        prefetchDone = 0
-        urls.chunked(8).forEach { slice ->
-            coroutineScope {
-                slice.map { url ->
-                    // Warm the disk cache only: tiny decode, no memory-cache churn (we're caching 246
-                    // images, not displaying them). Swallow per-image failures so one bad thumbnail
-                    // can't sink the whole load.
-                    async(Dispatchers.IO) {
-                        runCatching {
-                            loader.execute(
-                                ImageRequest.Builder(ctx).data(url)
-                                    .size(64)
-                                    .memoryCachePolicy(CachePolicy.DISABLED)
-                                    .build(),
-                            )
-                        }
-                    }
-                }.awaitAll()
-            }
-            prefetchDone = minOf(prefetchDone + slice.size, prefetchTotal)
         }
     }
 

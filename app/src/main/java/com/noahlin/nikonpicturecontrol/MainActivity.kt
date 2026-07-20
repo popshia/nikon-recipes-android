@@ -174,8 +174,7 @@ private fun LibraryGate(store: RecipeStore) {
                 if (store.isPreparingInitial) {
                     CircularProgressIndicator()
                     Text(
-                        if (store.prefetchTotal > 0) "Loading previews… ${store.prefetchDone}/${store.prefetchTotal}"
-                        else "Fetching recipes…",
+                        "Fetching recipes…",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
