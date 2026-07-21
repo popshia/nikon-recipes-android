@@ -16,7 +16,7 @@ fun String?.nilIfBlank(): String? = this?.trim()?.takeIf { it.isNotEmpty() }
 data class Recipe(
     val id: String,
     val name: String,
-    val slug: String,
+    val slug: String? = null,
     val category: String? = null,
     val tags: List<String> = emptyList(),
     val description: String? = null,
@@ -35,7 +35,7 @@ data class Recipe(
     val images: List<String>? = null,
     /** Small list thumbnail path (R2-relative), if any. Falls back to the first image. */
     val thumb: String? = null,
-    /** Content hash of the recipe's assets, set at import — reserved for cache eviction (see [RecipeStore]). */
+    /** Content hash of the recipe's assets; drives stale-cache eviction on fetch (see [RecipeStore]). */
     val assetHash: String? = null,
     /** External link to the recipe on the creator's site, if there is no bundled file. */
     val recipeLink: String? = null,

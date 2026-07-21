@@ -26,15 +26,17 @@ There is no test suite in this repo — verify changes by running the app.
 
 The app ships with **no recipe data** and streams the library from Cloudflare R2 — the same
 bucket the iOS app uses (`Recipe.IMAGE_BASE_URL`). On first launch `RecipeStore.fetchLatest()`
-downloads the index (`<base>/np3_list.json`) into internal storage, caches it, and prefetches
-every list thumbnail (behind the `LibraryGate` in `MainActivity`). Full images and `.NP3` files
-stream on demand; Coil disk-caches images, and cloud `.NP3`s download to `cache/NP3/<id>/` when
-shared. Settings → **Fetch Latest Recipes** re-pulls the index, so new recipes appear with no app
-rebuild. There is no data to copy from the iOS repo — both apps point at the same R2 URLs.
+downloads the index (`<base>/np3_list.json`) into internal storage and caches it (the `LibraryGate`
+in `MainActivity` waits only on the index). Thumbnails, full images, and `.NP3` files all stream on
+demand — Coil disk-caches images as they're shown, and cloud `.NP3`s download to `cache/NP3/<id>/`
+when shared. Settings → **Fetch Latest Recipes** re-pulls the index, so new recipes appear with no
+app rebuild (and a popup lists any newly-added ones). There is no data to copy from the iOS repo —
+both apps point at the same R2 URLs.
 
 Index/asset schema: each recipe carries relative asset paths (`images`, `thumb`, `np3`); a remote
-URL is `IMAGE_BASE_URL + path` with segments percent-encoded (paths contain spaces). `assetHash`
-is reserved for future cache eviction (the index does not emit it yet).
+URL is `IMAGE_BASE_URL + path` with segments percent-encoded (paths contain spaces). Each recipe
+also carries an `assetHash`; on fetch, `RecipeStore.evictChangedAssets()` drops the cached
+thumbnail/images/`.NP3` of any recipe whose hash changed, so updated assets re-download.
 
 ## Architecture
 

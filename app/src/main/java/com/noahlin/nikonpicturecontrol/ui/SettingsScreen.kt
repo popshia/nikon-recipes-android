@@ -133,6 +133,16 @@ fun SettingsScreen(store: RecipeStore, nav: NavController) {
             }
             item { AppFooter() }
         }
+
+        val newNames = store.lastFetchedNames
+        if (newNames.isNotEmpty()) {
+            AlertDialog(
+                onDismissRequest = store::clearLastFetched,
+                title = { Text("${newNames.size} New Recipe${if (newNames.size == 1) "" else "s"}") },
+                text = { Text(newNames.joinToString("\n")) },
+                confirmButton = { TextButton(onClick = store::clearLastFetched) { Text("OK") } },
+            )
+        }
     }
 }
 

@@ -7,6 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import coil.imageLoader
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -40,7 +41,11 @@ class RecipeStore(app: Application) : AndroidViewModel(app) {
     /** True while the first-launch fetch runs (no cached library yet) — drives the full-screen gate. */
     var isPreparingInitial by mutableStateOf(false); private set
     var fetchError by mutableStateOf<String?>(null); private set
+    /** Names of recipes new in the last [fetchLatest] (empty on first-launch fetch) — drives the popup. */
+    var lastFetchedNames by mutableStateOf<List<String>>(emptyList()); private set
     val hasLibrary: Boolean get() = library.isNotEmpty()
+
+    fun clearLastFetched() { lastFetchedNames = emptyList() }
 
     var favorites by mutableStateOf(prefs.getStringSet("favorites", emptySet())!!.toSet()); private set
     var userNotes by mutableStateOf(loadJsonMapString("userNotes")); private set
@@ -200,11 +205,15 @@ class RecipeStore(app: Application) : AndroidViewModel(app) {
         fetchError = null
         viewModelScope.launch {
             try {
+                val initial = library.isEmpty()
                 val body = withContext(Dispatchers.IO) { httpGet(Recipe.INDEX_URL) }
                 val list = json.decodeFromString<List<Recipe>>(body)
-                // ponytail: iOS evicts stale caches by comparing per-recipe assetHash, but the R2
-                // index emits no assetHash yet, so eviction is inert — skip until hashes land.
-                withContext(Dispatchers.IO) { indexCacheFile().writeText(body) }
+                val existing = library.map { it.id }.toSet()
+                lastFetchedNames = if (initial) emptyList() else list.filterNot { it.id in existing }.map { it.name }
+                withContext(Dispatchers.IO) {
+                    evictChangedAssets(library, list)   // drop stale caches for updated recipes
+                    indexCacheFile().writeText(body)
+                }
                 library = list
                 recipes = merged()
             } catch (e: Exception) {
@@ -213,6 +222,22 @@ class RecipeStore(app: Application) : AndroidViewModel(app) {
                 isFetching = false
                 isPreparingInitial = false
             }
+        }
+    }
+
+    /**
+     * When a recipe's [Recipe.assetHash] changes between the cached and fetched index, drop its
+     * cached thumbnail / full images / `.NP3` so they re-download with the new content. Mirrors iOS.
+     */
+    private fun evictChangedAssets(old: List<Recipe>, new: List<Recipe>) {
+        val newHash = new.associate { it.id to it.assetHash }
+        val disk = ctx.imageLoader.diskCache
+        for (r in old) {
+            if (r.id !in newHash || newHash[r.id] == r.assetHash) continue
+            (listOf(r.thumbModel(ctx)) + r.imageModels(ctx))
+                .filterIsInstance<String>()
+                .forEach { disk?.remove(it) }
+            File(ctx.cacheDir, "NP3/${r.id}").deleteRecursively()
         }
     }
 
