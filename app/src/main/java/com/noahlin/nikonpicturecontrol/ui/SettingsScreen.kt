@@ -45,6 +45,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -67,6 +68,13 @@ import com.noahlin.nikonpicturecontrol.nilIfBlank
 @Composable
 fun SettingsScreen(store: RecipeStore, nav: NavController) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+    // Show the fetch-result dialog once a user-initiated fetch finishes without error (mirrors iOS).
+    var showFetchResult by remember { mutableStateOf(false) }
+    var prevFetching by remember { mutableStateOf(store.isFetching) }
+    LaunchedEffect(store.isFetching) {
+        if (prevFetching && !store.isFetching && store.fetchError == null) showFetchResult = true
+        prevFetching = store.isFetching
+    }
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
@@ -134,13 +142,16 @@ fun SettingsScreen(store: RecipeStore, nav: NavController) {
             item { AppFooter() }
         }
 
-        val newNames = store.lastFetchedNames
-        if (newNames.isNotEmpty()) {
+        if (showFetchResult) {
+            val names = store.lastFetchedNames
+            val dismiss = { showFetchResult = false; store.clearLastFetched() }
             AlertDialog(
-                onDismissRequest = store::clearLastFetched,
-                title = { Text("${newNames.size} New Recipe${if (newNames.size == 1) "" else "s"}") },
-                text = { Text(newNames.joinToString("\n")) },
-                confirmButton = { TextButton(onClick = store::clearLastFetched) { Text("OK") } },
+                onDismissRequest = dismiss,
+                title = { Text(if (names.isEmpty()) "Up to Date"
+                               else "${names.size} New Recipe${if (names.size == 1) "" else "s"}") },
+                text = { Text(if (names.isEmpty()) "You already have the latest recipes."
+                              else names.joinToString("\n")) },
+                confirmButton = { TextButton(onClick = dismiss) { Text("OK") } },
             )
         }
     }
