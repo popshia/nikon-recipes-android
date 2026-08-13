@@ -242,8 +242,11 @@ class RecipeStore(app: Application) : AndroidViewModel(app) {
     }
 
     private fun httpGet(urlStr: String): String {
+        // R2 sends no Cache-Control; force network so Fetch Latest never reports stale data
+        // from an HTTP response cache. Assets it points at are content-addressed, so still cacheable.
         val conn = (URL(urlStr).openConnection() as HttpURLConnection).apply {
             connectTimeout = 15_000; readTimeout = 20_000; requestMethod = "GET"
+            useCaches = false
         }
         try {
             if (conn.responseCode >= 400) throw IOException("Server returned ${conn.responseCode}")

@@ -31,6 +31,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.noahlin.nikonpicturecontrol.RecipeStore
@@ -95,9 +96,10 @@ fun AuthorScreen(author: String, store: RecipeStore, nav: NavController) {
                     Column {
                         Text(recipe.name, style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.SemiBold)
-                        recipe.category?.takeIf { it.isNotEmpty() }?.let {
-                            Text(it, style = MaterialTheme.typography.labelMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        recipe.tags.takeIf { it.isNotEmpty() }?.let {
+                            Text(it.joinToString(" · "), style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                maxLines = 1, overflow = TextOverflow.Ellipsis)
                         }
                     }
                 }
