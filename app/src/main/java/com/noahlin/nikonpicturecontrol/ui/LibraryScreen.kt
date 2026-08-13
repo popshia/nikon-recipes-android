@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -30,7 +31,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -50,6 +54,14 @@ fun LibraryScreen(store: RecipeStore, nav: NavController, savedTab: Boolean = fa
     var author by remember { mutableStateOf<String?>(null) }
     var asCards by remember { mutableStateOf(true) }
     var showFilters by remember { mutableStateOf(false) }
+
+    // After a pull-to-refresh finishes cleanly, report new recipes (or "Up to Date"). Library tab only.
+    var showFetchResult by remember { mutableStateOf(false) }
+    var prevFetching by remember { mutableStateOf(store.isFetching) }
+    LaunchedEffect(store.isFetching) {
+        if (!savedTab && prevFetching && !store.isFetching && store.fetchError == null) showFetchResult = true
+        prevFetching = store.isFetching
+    }
 
     val hasFilter = category != null || tag != null || author != null
 
@@ -81,7 +93,8 @@ fun LibraryScreen(store: RecipeStore, nav: NavController, savedTab: Boolean = fa
             )
         },
     ) { pad ->
-        Column(Modifier.padding(pad).fillMaxSize()) {
+        val body = @Composable {
+        Column(Modifier.fillMaxSize()) {
             Text(
                 "${filtered.size} of ${store.recipes.size} recipes",
                 style = MaterialTheme.typography.labelMedium,
@@ -122,6 +135,30 @@ fun LibraryScreen(store: RecipeStore, nav: NavController, savedTab: Boolean = fa
                 }
             }
         }
+        }
+        // Pull-to-refresh fetches the latest recipes on the Library tab (Favorites just lists).
+        if (savedTab) {
+            Box(Modifier.padding(pad).fillMaxSize()) { body() }
+        } else {
+            PullToRefreshBox(
+                isRefreshing = store.isFetching,
+                onRefresh = { store.fetchLatest() },
+                modifier = Modifier.padding(pad).fillMaxSize(),
+            ) { body() }
+        }
+    }
+
+    if (showFetchResult) {
+        val names = store.lastFetchedNames
+        val dismiss = { showFetchResult = false; store.clearLastFetched() }
+        AlertDialog(
+            onDismissRequest = dismiss,
+            title = { Text(if (names.isEmpty()) "Up to Date"
+                           else "${names.size} New Recipe${if (names.size == 1) "" else "s"}") },
+            text = { Text(if (names.isEmpty()) "You already have the latest recipes."
+                          else names.joinToString("\n")) },
+            confirmButton = { TextButton(onClick = dismiss) { Text("OK") } },
+        )
     }
 
     if (showFilters) {

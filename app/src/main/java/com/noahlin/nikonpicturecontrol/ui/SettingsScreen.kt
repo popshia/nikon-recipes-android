@@ -22,7 +22,6 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.automirrored.filled.HelpOutline
 import androidx.compose.material.icons.filled.GridView
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Sell
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -30,7 +29,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
@@ -45,7 +43,6 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -68,13 +65,6 @@ import com.noahlin.nikonpicturecontrol.nilIfBlank
 @Composable
 fun SettingsScreen(store: RecipeStore, nav: NavController) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
-    // Show the fetch-result dialog once a user-initiated fetch finishes without error (mirrors iOS).
-    var showFetchResult by remember { mutableStateOf(false) }
-    var prevFetching by remember { mutableStateOf(store.isFetching) }
-    LaunchedEffect(store.isFetching) {
-        if (prevFetching && !store.isFetching && store.fetchError == null) showFetchResult = true
-        prevFetching = store.isFetching
-    }
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
@@ -100,27 +90,6 @@ fun SettingsScreen(store: RecipeStore, nav: NavController) {
                 }
             }
             item {
-                SettingsGroup("Library sync") {
-                    ListItem(
-                        headlineContent = { Text("Fetch Latest Recipes") },
-                        supportingContent = { Text("Download new recipes from the cloud") },
-                        leadingContent = { Icon(Icons.Default.Refresh, contentDescription = null) },
-                        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-                        modifier = Modifier.clickable(enabled = !store.isFetching) { store.fetchLatest() },
-                    )
-                    if (store.isFetching) {
-                        LinearProgressIndicator(
-                            Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
-                        )
-                    }
-                    store.fetchError?.let {
-                        Text(it, style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.error,
-                            modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 12.dp))
-                    }
-                }
-            }
-            item {
                 SettingsGroup("Help") {
                     SettingListItem(Icons.AutoMirrored.Filled.HelpOutline,
                         "How to add NP3 to Nikon cameras",
@@ -140,19 +109,6 @@ fun SettingsScreen(store: RecipeStore, nav: NavController) {
                 }
             }
             item { AppFooter() }
-        }
-
-        if (showFetchResult) {
-            val names = store.lastFetchedNames
-            val dismiss = { showFetchResult = false; store.clearLastFetched() }
-            AlertDialog(
-                onDismissRequest = dismiss,
-                title = { Text(if (names.isEmpty()) "Up to Date"
-                               else "${names.size} New Recipe${if (names.size == 1) "" else "s"}") },
-                text = { Text(if (names.isEmpty()) "You already have the latest recipes."
-                              else names.joinToString("\n")) },
-                confirmButton = { TextButton(onClick = dismiss) { Text("OK") } },
-            )
         }
     }
 }

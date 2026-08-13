@@ -54,6 +54,24 @@ class RecipeStore(app: Application) : AndroidViewModel(app) {
 
     var recentlySearchedIds by mutableStateOf(loadJsonStringList("recentlySearched")); private set
 
+    /** When each recipe id was first seen locally (epoch ms) — the "added date" for sorting.
+     *  No date ships in the index, so a recipe's first appearance in a fetch stamps its time. */
+    var firstSeen by mutableStateOf(loadFirstSeen()); private set
+
+    init { markSeen(recipes) }
+
+    private fun loadFirstSeen(): Map<String, Long> =
+        prefs.getString("firstSeen", null)?.let { runCatching { json.decodeFromString<Map<String, Long>>(it) }.getOrNull() }
+            ?: emptyMap()
+
+    private fun markSeen(list: List<Recipe>) {
+        val missing = list.filter { it.id !in firstSeen }
+        if (missing.isEmpty()) return
+        val now = System.currentTimeMillis()
+        firstSeen = firstSeen + missing.associate { it.id to now }
+        prefs.edit().putString("firstSeen", json.encodeToString(firstSeen)).apply()
+    }
+
     var dynamicColorEnabled by mutableStateOf(prefs.getBoolean("dynamicColor", false)); private set
 
     fun setDynamicColor(enabled: Boolean) {
@@ -104,6 +122,7 @@ class RecipeStore(app: Application) : AndroidViewModel(app) {
         custom = custom + recipe
         saveCustom()
         recipes = merged()
+        markSeen(recipes)
     }
 
     /** Save an edit matched by id: a custom recipe is replaced in place; a bundled one becomes an override. */
@@ -216,6 +235,7 @@ class RecipeStore(app: Application) : AndroidViewModel(app) {
                 }
                 library = list
                 recipes = merged()
+                markSeen(recipes)
             } catch (e: Exception) {
                 fetchError = e.message ?: "Couldn't load recipes"
             } finally {
