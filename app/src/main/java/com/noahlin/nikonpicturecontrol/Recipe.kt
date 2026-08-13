@@ -37,6 +37,8 @@ data class Recipe(
     val thumb: String? = null,
     /** Content hash of the recipe's assets; drives stale-cache eviction on fetch (see [RecipeStore]). */
     val assetHash: String? = null,
+    /** Import date `YYYY-MM-DD`, if any — used for "Added Date" sorting (plain string order). */
+    val addedAt: String? = null,
     /** External link to the recipe on the creator's site, if there is no bundled file. */
     val recipeLink: String? = null,
 ) {
@@ -66,6 +68,34 @@ data class Recipe(
         const val INDEX_URL = "$IMAGE_BASE_URL/np3_list.json"
     }
 }
+
+/** What the library browse orders by. `addedAt` is `YYYY-MM-DD`, so date order is plain string order. */
+enum class LibrarySort(val label: String) {
+    ADDED_DATE("Added Date"),
+    NAME("Recipe Name"),
+    AUTHOR("Author Name");
+
+    fun key(r: Recipe): String? = when (this) {
+        ADDED_DATE -> r.addedAt
+        NAME -> r.name
+        AUTHOR -> r.author
+    }
+}
+
+/**
+ * Sort by the chosen field. Recipes missing the field sort last in either direction; ties always
+ * break on name ascending so the order can't jitter when many recipes share one key (mirrors iOS).
+ */
+fun List<Recipe>.sortedFor(sort: LibrarySort, descending: Boolean): List<Recipe> =
+    sortedWith { a, b ->
+        val x = sort.key(a); val y = sort.key(b)
+        if ((x == null) != (y == null)) return@sortedWith if (x == null) 1 else -1
+        if (x != null && y != null) {
+            val c = x.compareTo(y, ignoreCase = true)
+            if (c != 0) return@sortedWith if (descending) -c else c
+        }
+        a.name.compareTo(b.name, ignoreCase = true)
+    }
 
 /** Where user-created recipes' image/NP3 files live. Internal storage, not cache, so it survives. */
 fun Context.recipeAssetsDir(): File =

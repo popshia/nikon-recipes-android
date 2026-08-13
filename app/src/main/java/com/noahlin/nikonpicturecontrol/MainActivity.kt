@@ -84,10 +84,11 @@ class MainActivity : ComponentActivity() {
                     val nav = rememberNavController()
                     // First launch (no cached index) fetches from R2; the gate below covers the UI
                     // until the index + thumbnails are ready, so browsing never shows placeholders.
-                    LaunchedEffect(Unit) { if (!store.hasLibrary) store.fetchLatest() }
+                    // Refresh the index on every launch; the gate only blocks on the first (empty) fetch.
+                    LaunchedEffect(Unit) { store.fetchLatest() }
                     Box(Modifier.fillMaxSize()) {
                     Scaffold(
-                        bottomBar = { BottomBar(nav) },
+                        bottomBar = { BottomBar(nav, store) },
                     ) { pad ->
                         NavHost(
                             nav,
@@ -199,7 +200,7 @@ private fun LibraryGate(store: RecipeStore) {
 
 /** Bottom navigation bar, visible only while a top-level destination is showing. */
 @Composable
-private fun BottomBar(nav: NavHostController) {
+private fun BottomBar(nav: NavHostController, store: RecipeStore) {
     val backStack by nav.currentBackStackEntryAsState()
     val currentRoute = backStack?.destination?.route
     if (currentRoute !in TopDest.entries.map { it.route }) return
@@ -210,6 +211,11 @@ private fun BottomBar(nav: NavHostController) {
             NavigationBarItem(
                 selected = selected,
                 onClick = {
+                    if (selected) {
+                        // Re-tapping the active Library tab scrolls its list to top.
+                        if (dest == TopDest.Library) store.requestLibraryScrollTop()
+                        return@NavigationBarItem
+                    }
                     nav.navigate(dest.route) {
                         // One saved back stack entry per tab, à la Now in Android.
                         popUpTo(nav.graph.findStartDestination().id) { saveState = true }

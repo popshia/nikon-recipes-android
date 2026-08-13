@@ -79,6 +79,24 @@ class RecipeStore(app: Application) : AndroidViewModel(app) {
         prefs.edit().putBoolean("dynamicColor", enabled).apply()
     }
 
+    // Library sort: field + direction, persisted. Default newest-added first.
+    var librarySort by mutableStateOf(
+        runCatching { LibrarySort.valueOf(prefs.getString("librarySort", null)!!) }
+            .getOrDefault(LibrarySort.ADDED_DATE)
+    ); private set
+    var librarySortDescending by mutableStateOf(prefs.getBoolean("librarySortDesc", true)); private set
+
+    // Bumped when the Library tab is re-tapped while active, so the list scrolls to top.
+    var libraryScrollTopToken by mutableStateOf(0); private set
+    fun requestLibraryScrollTop() { libraryScrollTopToken++ }
+
+    fun setLibrarySort(sort: LibrarySort, descending: Boolean) {
+        librarySort = sort
+        librarySortDescending = descending
+        prefs.edit().putString("librarySort", sort.name).putBoolean("librarySortDesc", descending).apply()
+        requestLibraryScrollTop()   // re-sorted order: jump back to the top
+    }
+
     private fun merged(): List<Recipe> =
         library.map { overrides[it.id] ?: it } + custom
 
