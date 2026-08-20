@@ -73,6 +73,7 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavController
 import com.noahlin.nikonpicturecontrol.RecipeStore
 import com.noahlin.nikonpicturecontrol.imageModels
+import androidx.compose.runtime.LaunchedEffect
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -80,6 +81,7 @@ import kotlinx.coroutines.launch
 fun DetailScreen(id: String, store: RecipeStore, nav: NavController) {
     val ctx = LocalContext.current
     val recipe = store.recipe(id) ?: return
+    LaunchedEffect(id) { store.clearNewRecipe(id) }   // opening a recipe clears its "New" badge
     var note by remember(id) { mutableStateOf(store.note(recipe)) }
     var fullScreenIndex by remember { mutableStateOf<Int?>(null) }
     var preparingNp3 by remember { mutableStateOf(false) }

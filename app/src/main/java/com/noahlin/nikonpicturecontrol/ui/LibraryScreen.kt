@@ -64,15 +64,16 @@ fun LibraryScreen(store: RecipeStore, nav: NavController, savedTab: Boolean = fa
     var asCards by remember { mutableStateOf(true) }
     var showFilters by remember { mutableStateOf(false) }
 
-    // Report new recipes (or "Up to Date") only after a user pull — not the silent launch refresh.
+    // Popup after a fetch: always on a user pull ("Up to Date" or new); on the silent launch
+    // refresh only when there actually are new recipes.
     var showFetchResult by remember { mutableStateOf(false) }
     var pulled by remember { mutableStateOf(false) }
     var prevFetching by remember { mutableStateOf(store.isFetching) }
     LaunchedEffect(store.isFetching) {
-        if (pulled && prevFetching && !store.isFetching) {
-            if (store.fetchError == null) showFetchResult = true
-            pulled = false
+        if (!savedTab && prevFetching && !store.isFetching && store.fetchError == null) {
+            if (pulled || store.lastFetchedNames.isNotEmpty()) showFetchResult = true
         }
+        if (prevFetching && !store.isFetching) pulled = false
         prevFetching = store.isFetching
     }
 
@@ -145,7 +146,9 @@ fun LibraryScreen(store: RecipeStore, nav: NavController, savedTab: Boolean = fa
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
                     items(filtered, key = { it.id }) { recipe ->
-                        RecipeCard(recipe) { nav.navigate("detail/${recipe.id}") }
+                        RecipeCard(recipe, isNew = recipe.id in store.newRecipeIds) {
+                            nav.navigate("detail/${recipe.id}")
+                        }
                     }
                 }
             } else {
@@ -155,7 +158,9 @@ fun LibraryScreen(store: RecipeStore, nav: NavController, savedTab: Boolean = fa
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     items(filtered, key = { it.id }) { recipe ->
-                        RecipeRow(recipe) { nav.navigate("detail/${recipe.id}") }
+                        RecipeRow(recipe, isNew = recipe.id in store.newRecipeIds) {
+                            nav.navigate("detail/${recipe.id}")
+                        }
                     }
                 }
             }

@@ -165,9 +165,23 @@ fun LabeledDropdown(
     }
 }
 
+/** Small "NEW" pill for recipes fetched since last open. */
+@Composable
+fun NewBadge(modifier: Modifier = Modifier) {
+    Text(
+        "NEW",
+        style = MaterialTheme.typography.labelMedium,
+        fontWeight = FontWeight.Bold,
+        color = MaterialTheme.colorScheme.onPrimary,
+        modifier = modifier
+            .background(MaterialTheme.colorScheme.primary, RoundedCornerShape(50))
+            .padding(horizontal = 10.dp, vertical = 4.dp),
+    )
+}
+
 /** Full-width recipe card: hero image + name/category + author/tags. Shared by Library and Random. */
 @Composable
-fun RecipeCard(recipe: Recipe, modifier: Modifier = Modifier, onClick: () -> Unit) {
+fun RecipeCard(recipe: Recipe, modifier: Modifier = Modifier, isNew: Boolean = false, onClick: () -> Unit) {
     val ctx = LocalContext.current
     Card(
         onClick = onClick,
@@ -176,10 +190,13 @@ fun RecipeCard(recipe: Recipe, modifier: Modifier = Modifier, onClick: () -> Uni
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         modifier = modifier.fillMaxWidth(),
     ) {
-        SampleImage(
-            recipe.thumbModel(ctx),
-            modifier = Modifier.fillMaxWidth().height(200.dp),
-        )
+        Box {
+            SampleImage(
+                recipe.thumbModel(ctx),
+                modifier = Modifier.fillMaxWidth().height(200.dp),
+            )
+            if (isNew) NewBadge(Modifier.align(Alignment.TopStart).padding(12.dp))
+        }
         Column(Modifier.padding(12.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(recipe.name, style = MaterialTheme.typography.titleMedium,
@@ -206,7 +223,7 @@ fun RecipeCard(recipe: Recipe, modifier: Modifier = Modifier, onClick: () -> Uni
 
 /** Compact recipe row: small thumbnail + name/author. Shared by Library, Search, Browse. */
 @Composable
-fun RecipeRow(recipe: Recipe, onClick: () -> Unit) {
+fun RecipeRow(recipe: Recipe, isNew: Boolean = false, onClick: () -> Unit) {
     val ctx = LocalContext.current
     Row(
         Modifier.fillMaxWidth().clickable(onClick = onClick).padding(vertical = 8.dp),
@@ -218,8 +235,12 @@ fun RecipeRow(recipe: Recipe, onClick: () -> Unit) {
             modifier = Modifier.size(56.dp).clip(RoundedCornerShape(8.dp)),
         )
         Column {
-            Text(recipe.name, style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Row(verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text(recipe.name, style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                if (isNew) NewBadge()
+            }
             recipe.author?.takeIf { it.isNotEmpty() }?.let {
                 Text(it, style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1)
