@@ -46,9 +46,20 @@ class RecipeStore(app: Application) : AndroidViewModel(app) {
     /** Ids of recipes newly fetched this session and not yet opened — drives the "New" badge.
      *  Deliberately NOT persisted: a relaunch clears every badge. */
     var newRecipeIds by mutableStateOf(emptySet<String>()); private set
+    /** Durable log of every fetch that brought new recipes (newest first, capped 50) — Settings → What's New. */
+    var fetchHistory by mutableStateOf(loadFetchHistory()); private set
     val hasLibrary: Boolean get() = library.isNotEmpty()
 
     fun clearLastFetched() { lastFetchedNames = emptyList() }
+
+    private fun loadFetchHistory(): List<FetchBatch> =
+        prefs.getString("fetchHistory", null)
+            ?.let { runCatching { json.decodeFromString<List<FetchBatch>>(it) }.getOrNull() } ?: emptyList()
+
+    private fun recordFetch(ids: List<String>) {
+        fetchHistory = (listOf(FetchBatch(System.currentTimeMillis(), ids)) + fetchHistory).take(50)
+        prefs.edit().putString("fetchHistory", json.encodeToString(fetchHistory)).apply()
+    }
 
     /** Drop a recipe's "New" badge once the user opens it. */
     fun clearNewRecipe(id: String) {
@@ -256,7 +267,10 @@ class RecipeStore(app: Application) : AndroidViewModel(app) {
                 val existing = library.map { it.id }.toSet()
                 val fresh = if (initial) emptyList() else list.filterNot { it.id in existing }
                 lastFetchedNames = fresh.map { it.name }
-                if (fresh.isNotEmpty()) newRecipeIds = newRecipeIds + fresh.map { it.id }
+                if (fresh.isNotEmpty()) {
+                    newRecipeIds = newRecipeIds + fresh.map { it.id }
+                    recordFetch(fresh.map { it.id })
+                }
                 withContext(Dispatchers.IO) {
                     evictChangedAssets(library, list)   // drop stale caches for updated recipes
                     indexCacheFile().writeText(body)

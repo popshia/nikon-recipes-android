@@ -59,6 +59,7 @@ import com.noahlin.nikonpicturecontrol.ui.Np3GuideScreen
 import com.noahlin.nikonpicturecontrol.ui.RandomScreen
 import com.noahlin.nikonpicturecontrol.ui.SearchScreen
 import com.noahlin.nikonpicturecontrol.ui.SettingsScreen
+import com.noahlin.nikonpicturecontrol.ui.WhatsNewScreen
 
 /** Top-level destinations shown in the bottom navigation bar. */
 private enum class TopDest(
@@ -102,6 +103,7 @@ class MainActivity : ComponentActivity() {
                             composable(TopDest.Random.route) { RandomScreen(store, nav) }
                             composable(TopDest.Search.route) { SearchScreen(store, nav) }
                             composable("settings") { SettingsScreen(store, nav) }
+                            composable("whatsnew") { WhatsNewScreen(store, nav) }
 
                             composable(
                                 "browse/{kind}/{value}",

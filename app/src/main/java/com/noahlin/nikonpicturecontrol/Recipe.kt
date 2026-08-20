@@ -69,6 +69,10 @@ data class Recipe(
     }
 }
 
+/** One fetch that brought new recipes: when it happened and which ids arrived. */
+@Serializable
+data class FetchBatch(val at: Long, val ids: List<String>)
+
 /** What the library browse orders by. `addedAt` is `YYYY-MM-DD`, so date order is plain string order. */
 enum class LibrarySort(val label: String) {
     ADDED_DATE("Added Date"),

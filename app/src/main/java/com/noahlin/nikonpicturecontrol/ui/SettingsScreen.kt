@@ -22,6 +22,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.automirrored.filled.HelpOutline
 import androidx.compose.material.icons.filled.GridView
+import androidx.compose.material.icons.filled.NewReleases
 import androidx.compose.material.icons.filled.Sell
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -82,6 +83,9 @@ fun SettingsScreen(store: RecipeStore, nav: NavController) {
         ) {
             item {
                 SettingsGroup("Library") {
+                    SettingListItem(Icons.Default.NewReleases, "What's New",
+                        "Recipes added in past updates") { nav.navigate("whatsnew") }
+                    SettingDivider()
                     SettingListItem(Icons.Default.GridView, "Edit categories",
                         "Rename or remove recipe categories") { nav.navigate("terms/category") }
                     SettingDivider()
@@ -175,7 +179,7 @@ private fun AppFooter() {
             Text("Nikon Recipes $it", style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
-        Text("Made by Noah Lin with 💛", style = MaterialTheme.typography.labelSmall,
+        Text("Made by Noah Lin with 📸", style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
