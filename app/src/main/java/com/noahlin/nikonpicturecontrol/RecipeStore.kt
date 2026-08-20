@@ -43,17 +43,16 @@ class RecipeStore(app: Application) : AndroidViewModel(app) {
     var fetchError by mutableStateOf<String?>(null); private set
     /** Names of recipes new in the last [fetchLatest] (empty on first-launch fetch) — drives the popup. */
     var lastFetchedNames by mutableStateOf<List<String>>(emptyList()); private set
-    /** Ids of recipes newly fetched and not yet opened — drives the "New" badge. Persisted. */
-    var newRecipeIds by mutableStateOf(prefs.getStringSet("newRecipeIds", emptySet())!!.toSet()); private set
+    /** Ids of recipes newly fetched this session and not yet opened — drives the "New" badge.
+     *  Deliberately NOT persisted: a relaunch clears every badge. */
+    var newRecipeIds by mutableStateOf(emptySet<String>()); private set
     val hasLibrary: Boolean get() = library.isNotEmpty()
 
     fun clearLastFetched() { lastFetchedNames = emptyList() }
 
     /** Drop a recipe's "New" badge once the user opens it. */
     fun clearNewRecipe(id: String) {
-        if (id !in newRecipeIds) return
         newRecipeIds = newRecipeIds - id
-        prefs.edit().putStringSet("newRecipeIds", newRecipeIds).apply()
     }
 
     var favorites by mutableStateOf(prefs.getStringSet("favorites", emptySet())!!.toSet()); private set
@@ -257,10 +256,7 @@ class RecipeStore(app: Application) : AndroidViewModel(app) {
                 val existing = library.map { it.id }.toSet()
                 val fresh = if (initial) emptyList() else list.filterNot { it.id in existing }
                 lastFetchedNames = fresh.map { it.name }
-                if (fresh.isNotEmpty()) {
-                    newRecipeIds = newRecipeIds + fresh.map { it.id }
-                    prefs.edit().putStringSet("newRecipeIds", newRecipeIds).apply()
-                }
+                if (fresh.isNotEmpty()) newRecipeIds = newRecipeIds + fresh.map { it.id }
                 withContext(Dispatchers.IO) {
                     evictChangedAssets(library, list)   // drop stale caches for updated recipes
                     indexCacheFile().writeText(body)

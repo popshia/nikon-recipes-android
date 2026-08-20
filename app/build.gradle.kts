@@ -24,8 +24,8 @@ android {
         applicationId = "com.noahlin.nikonpicturecontrol"
         minSdk = 26
         targetSdk = 36
-        versionCode = 25
-        versionName = "4.5"
+        versionCode = 26
+        versionName = "4.5.1"
     }
 
     signingConfigs {
